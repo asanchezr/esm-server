@@ -1,0 +1,219 @@
+
+<div class="view-title-container flex-row">
+    <h1><span ng-show="project.name">Add/Edit Comment Period</h1>
+    <div class="actions">
+        <a class="btn btn-default btn-sm" ui-sref="p.commentperiod.list" ng-disabled="busy">Cancel</a>
+        <a class="btn btn-primary btn-sm" href ng-click="save()" ng-disabled="busy">Save</a>
+    </div>
+</div>
+
+<div class="view-body-container">
+    <div class="spinner-container" ng-show="busy">
+        <div class="spinner-new rotating"></div>
+    </div>
+
+    <div ng-show="hasErrors" class="alert alert-danger flex-row">
+        <div class="alert-icon"><span class="glyphicon glyphicon-exclamation-sign"></span></div>
+        <div class="alert-msg">
+            <span class="alert-msg-title">Roles &amp; Permissions are not complete.</span>
+            <span class="alert-msg-details">There must be at least one (1) role assigned to each permission.</span>
+        </div>
+    </div>
+
+    <!-- TABS -->
+    <ul class="nav nav-tabs" ng-init="form.curTab = 'pcpRelatedDocs'">
+        <li role="presentation" ng-class="{'active':form.curTab === 'pcpRelatedDocs'}">
+            <a href ng-click="form.curTab = 'pcpRelatedDocs'">Related Documents</a>
+        </li>
+        <li role="presentation" ng-class="{'active':form.curTab === 'pcpDateRange'}">
+            <a href ng-click="form.curTab = 'pcpDateRange'">Date Range</a>
+        </li>
+        <li role="presentation" ng-class="{'active':form.curTab === 'pcpRoles'}">
+            <a href ng-click="form.curTab = 'pcpRoles'">Roles &amp; Permissions</a>
+        </li>
+    </ul><!-- / TABS -->
+
+    <!-- RELATED DOCUMENTS -->
+    <div class="tab-pane" ng-show="form.curTab === 'pcpRelatedDocs'">
+        <div class="panel-group">
+            <!-- PACKAGE 1 -->
+            <div class="panel panel-default">
+                <div class="panel-heading flex-row">
+                    <h2>1. Provincial Content</h2>
+                </div>
+                <div class="panel-body">
+                    <div class="form-group">
+                        <label class="control-label">Information Being Commented On</label>
+                        <input class="form-control" type="text" ng-model="period.informationLabel" spellcheck="false"></input>
+                    </div>
+                    <div class="button-bar">
+                        <button class="btn btn-sm btn-default" title="Link Documents"
+                                ng-if="project.userCan.createCommentPeriod"
+                                x-document-mgr-link-modal
+                                x-project="project"
+                                x-target-name="'Provincial Package'"
+                                x-published-only="'true'"
+                                x-on-ok="addFilesToPackage1"><span class="glyphicon glyphicon-link"></span><span>Link Documents</span></button>
+                    </div>
+                    <tmpl-period-documents-list x-file-list="period.relatedDocuments"></tmpl-comment-period-documents-list>
+                    <div class="form-group">
+                        <label class="control-label">Additional Information <em>(optional)</em></label>
+                        <input class="form-control" type="input" ng-model="period.additionalText" spellcheck="false"></input>
+                    </div>
+                </div>
+            </div>
+            <!-- / PACKAGE 1 -->
+
+            <!-- PACKAGE 2 -->
+            <div class="panel panel-default">
+                <div class="panel-heading flex-row">
+                    <h2>2. Federal Content</h2>
+                </div>
+                <div class="panel-body">
+                    <div class="form-group">
+                        <label class="control-label">Information Being Commented On</label>
+                        <input class="form-control" type="text" ng-model="period.informationLabelPackage2" spellcheck="false"></input>
+                    </div>
+                    <div class="button-bar">
+                        <button class="btn btn-sm btn-default" title="Link Documents"
+                                ng-if="project.userCan.createCommentPeriod"
+                                x-document-mgr-link-modal
+                                x-project="project"
+                                x-target-name="'Federal Package'"
+                                x-published-only="'true'"
+                                x-on-ok="addFilesToPackage2"><span class="glyphicon glyphicon-link"></span><span>Link Documents</span></button>
+                    </div>
+                    <tmpl-period-documents-list x-file-list="period.relatedDocumentsPackage2"></tmpl-comment-period-documents-list>
+                    <div class="form-group">
+                        <label class="control-label">Additional Information <em>(optional)</em></label>
+                        <input class="form-control" type="input" ng-model="period.additionalTextPackage2" spellcheck="false"></input>
+                    </div>
+                </div>
+            </div>
+            <!-- / PACKAGE 2 -->
+
+            <!-- PREVIEW INFORMATION -->
+            <div class="panel panel-default">
+                <div class="panel-heading flex-row">
+                    <h2>3. Preview Information</h2>
+                </div>
+                <div style="padding: 0 1.5rem; opacity: 1; line-height: 16px; color: rgb(153, 153, 153); font-size: 12px; font-weight: bold; text-align: left;">
+                    <p>This is how your content will appear to the general public</p>
+                </div>
+                <div class="panel-body">
+                    <div class="form-group">
+                        <textarea class="form-control" disabled ng-bind-html="period.instructions"></textarea>
+                    </div>
+                </div>
+            </div>
+            <!-- / PREVIEW INFORMATION -->
+        </div>
+    </div>
+    <!-- / RELATED DOCUMENTS -->
+
+    <!-- DATE RANGE TAB CONTENT -->
+    <div class="tab-pane" ng-show="form.curTab === 'pcpDateRange'">
+        <div class="row">
+            <div class="col-md-3">
+                <section class="form-group">
+                    <h2>Set Comment Period Dates</h2>
+                    <div class="radio-group">
+                        <label class="control-label" ng-repeat="t in rangeTypes">
+                            <input type="radio" name="dateOptions" ng-model="ui.rType" ng-change="typeChange()" ng-value="t" /> {{t.displayName}}
+                        </label>
+                    </div>
+                </section>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label class="control-label">Duration</label>
+                    <select class="form-control"
+                        ng-disabled="!rangePickerEnabled"
+                        ng-change="periodChange()"
+                        ng-model="ui.rOption"
+                        ng-options="p.displayName for p in rangeOptions"
+                        ng-selected="p === ui.rOption">
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label class="control-label">Start Date</label>
+                    <div class="form-control pcp-date date-picker"
+                        ng-disabled="!startPickerEnabled" x-max="period.dateCompleted"
+                        x-modal-date-picker x-selected-date="period.dateStarted" x-picker-enabled="startPickerEnabled"
+                        title="{{ period.dateStarted | amDateFormat:'HH:mm:ss' }}">
+                        <span ng-if="!period.dateStarted">Start Date</span>
+                        {{ period.dateStarted | amDateFormat:'MMMM DD, YYYY' }}
+                        <span class="glyphicon glyphicon-calendar"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label class="control-label">End Date</label>
+                    <div class="form-control pcp-date date-picker"
+                        ng-disabled="!endPickerEnabled" x-min="period.dateStarted"
+                        x-modal-date-picker x-selected-date="period.dateCompleted" x-picker-enabled="endPickerEnabled"
+                        title="{{ period.dateCompleted | amDateFormat:'HH:mm:ss' }}">
+                        <span ng-if="!period.dateCompleted">End Date</span>
+                        {{ period.dateCompleted | amDateFormat:'MMMM DD, YYYY' }}
+                        <span class="glyphicon glyphicon-calendar"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- / DATE RANGE TAB CONTENT -->
+
+    <!-- ROLES & PERMISSIONS TAB CONTENT -->
+    <div class="tab-pane" ng-show="form.curTab === 'pcpRoles'">
+        <div class="clearfix">
+            <label>Can Post Comments</label>
+            <a class="pull-right btn btn-link btn-xs" ng-if="period.periodType !== 'Public'"
+                x-role-chooser
+                x-context="project"
+                x-current="period.commenterRoles"
+                x-public="true"><span class="glyphicon glyphicon-pencil"></span><span>Edit Roles</span>
+            </a>
+        </div>
+        <ul class="list-group">
+            <li class="list-group-item" ng-if="period.commenterRoles == 0">No Roles assigned.</li>
+            <li class="list-group-item" ng-repeat="role in period.commenterRoles">{{ role }}</li>
+        </ul>
+
+        <div class="clearfix">
+            <label>Can Vet Comments</label>
+            <a class="pull-right btn btn-link btn-xs"
+                x-role-chooser
+                x-context="project"
+                x-current="period.vettingRoles"
+                x-public="false"
+                x-allowed-roles="'assessment-lead,assessment-team,project-epd'"><span class="glyphicon glyphicon-pencil"></span><span>Edit Roles</span>
+            </a>
+        </div>
+        <ul class="list-group">
+            <li class="list-group-item" ng-if="period.vettingRoles == 0">No Roles assigned.</li>
+            <li class="list-group-item" ng-repeat="role in period.vettingRoles | orderBy">{{ role }}</li>
+        </ul>
+
+        <div class="clearfix">
+            <label>Can Download Comments</label>
+            <a class=" pull-right btn btn-link btn-xs"
+                x-role-chooser
+                x-context="project"
+                x-current="period.downloadRoles"
+                x-public="false"
+                x-allowed-roles="'assessment-lead,assessment-team,project-epd,proponent-lead,proponent-team'"><span class="glyphicon glyphicon-pencil"></span><span>Edit Roles</span>
+            </a>
+        </div>
+        <ul class="list-group">
+            <li class="list-group-item" ng-if="period.downloadRoles == 0">No Roles assigned.</li>
+            <li class="list-group-item" ng-repeat="role in period.downloadRoles | orderBy">{{ role }}</li>
+        </ul>
+    </div>
+    <!-- / ROLES & PERMISSIONS TAB CONTENT -->
+
+</div>
