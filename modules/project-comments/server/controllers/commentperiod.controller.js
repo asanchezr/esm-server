@@ -88,6 +88,12 @@ module.exports = DBModel.extend ({
 		period.vettingRoles = _.uniq(_.concat(period.vettingRoles, ['project-system-admin']));
 		period.classificationRoles = _.uniq(_.concat(period.classificationRoles, ['project-system-admin']));
 
+		// EPIC-932 Joint PCP logic follows...
+		// TODO
+		// var allowedDownloadRoles = ['assessment-lead', 'assessment-team', 'project-epd', 'proponent-lead', 'proponent-team'];
+		// period.downloadRoles = _.intersection(period.downloadRoles, allowedDownloadRoles);
+		// period.downloadRoles = _.uniq(_.concat(period.downloadRoles, ['assessment-ceaa', 'project-system-admin']));
+
 		var allroles = _.uniq(period.commenterRoles.concat (
 			period.classificationRoles,
 			period.vettingRoles,
@@ -259,7 +265,17 @@ module.exports = DBModel.extend ({
 				})
 				.then(function(rd) {
 					period.relatedDocuments = rd;
-					return self.getStats(period);
+					return period;
+				})
+				.then(function(p) {
+					return docs.list({_id: {$in: p.relatedDocumentsPackage2} });
+				})
+				.then(function(rd2) {
+					period.relatedDocumentsPackage2 = rd2;
+					return period;
+				})
+				.then(function(p) {
+					return self.getStats(p);
 				})
 				.then(function(data) {
 					resolve(data);
@@ -279,6 +295,14 @@ module.exports = DBModel.extend ({
 							docs.list({_id: {$in: p.relatedDocuments} })
 								.then(function(ds) {
 									p.relatedDocuments = ds;
+								})
+								.then(function() {
+									return docs.list({_id: {$in: p.relatedDocumentsPackage2} });
+								})
+								.then(function(ds2) {
+									p.relatedDocumentsPackage2 = ds2;
+								})
+								.then(function() {
 									resolve(p);
 								});
 						});

@@ -46,6 +46,16 @@ module.exports = require ('../../../core/server/controllers/core.schema.controll
 	pillars          : [String],
 	topics           : [String],
 
+	// -------------------------------------------------------------------------
+	//
+	// these are specific to joint comments (Joint PCP)
+	//
+	// -------------------------------------------------------------------------
+	//
+	// the package of information for which this comment has been made; e.g. Provincial, Federal
+	//
+	packageType     : { type:String, default:'Provincial', enum:['Provincial', 'Federal'] },
+
 	// ESM-431 - want each comment within a period to have a unique number (not guid)
 	//           for export and sorting
 	commentId: {type: Number},
