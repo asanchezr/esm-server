@@ -1,8 +1,8 @@
 
 <div class="public-comment-period-view flex-column"
-     ng-if="period.periodType === 'Public' || period.periodType === 'Joint'"
+     ng-if="isPublic || isJoint"
      ng-include="'modules/project-comments/client/views/public-comments/main.html'">
 </div>
-<div ng-if="period.periodType !== 'Public' && period.periodType !== 'Joint'"
+<div ng-if="!isPublic && !isJoint"
      ng-include="'modules/project-comments/client/views/wg-comments/main.html'">
 </div>

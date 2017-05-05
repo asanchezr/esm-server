@@ -245,6 +245,9 @@ angular.module('comment').config(['$stateProvider', 'moment', "_", function ($st
 			$scope.isClosed = (end < today);
 			$scope.period   = period;
 			$scope.project  = project;
+			$scope.isJoint = $scope.period.periodType === 'Joint';
+			$scope.isPublic = $scope.period.periodType === 'Public';
+
 			// convert instructions to displayable HTML
 			$scope.aboutThisPeriod = period.instructions.replace(/\n/g,"<br>");
 			// anyone with vetting comments can add a comment at any time

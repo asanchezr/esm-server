@@ -29,7 +29,7 @@
     <ul class="nav nav-tabs" role="tablist">
         <li class="active" role="presentation"><a href="#pcpComments" aria-controls="pcpComments" role="tab" data-toggle="tab">Comments</a></li>
         <li role="presentation"><a href="#pcpDocuments" aria-controls="pcpDocuments" role="tab" data-toggle="tab">Related Documents</a></li>
-		<li role="presentation"><a href="#pcpOpenHouse" aria-controls="pcpOpenHouse" role="tab" data-toggle="tab">Open Houses</a></li>
+				<li role="presentation"  ng-if="isPublic"><a href="#pcpOpenHouse" aria-controls="pcpOpenHouse" role="tab" data-toggle="tab">Open Houses</a></li>
     </ul>
 
     <div class="pcp-tab-content tab-content">
@@ -98,7 +98,7 @@
         </div><!-- / Documents Tab -->
 
 		<!-- Open House Dates -->
-		<div class="tab-pane" role="tab-panel" id="pcpOpenHouse">
+		<div class="tab-pane" ng-if="isPublic" role="tab-panel" id="pcpOpenHouse">
 			<div class="table-container">
 				<table class="open-house-table table">
 					<thead>
