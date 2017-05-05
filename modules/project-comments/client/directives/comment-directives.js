@@ -307,17 +307,20 @@ angular.module ('comment')
 					resolve: {
 						docs: function() {
 							return CommentModel.getDocuments(comment._id);
+						},
+						docs2: function() {
+							return CommentModel.getDocuments2(comment._id);
 						}
 					},
-					controller: function ($scope, $modalInstance, docs) {
+					controller: function ($scope, $modalInstance, docs, docs2) {
 						var self = this;
-
-
 						self.period      				= period;
 						self.project     				= project;
 						self.comment     				= angular.copy(comment);
 						self.comment.documents 	= angular.copy(docs);
-
+						self.comment.documents2 	= angular.copy(docs2);
+						self.isJoint = s.period.periodType === 'Joint';
+						self.isPublic = s.period.periodType === 'Public';
 						self.canUpdate = (self.period.userCan.classifyComments || self.period.userCan.vetComments);
 						self.rejectedReasons = ['', 'Unsuitable Language', 'Quoting Third Parties', 'Petitions', 'Personally Identifying Information'];
 
@@ -376,6 +379,11 @@ angular.module ('comment')
 					Promise.resolve()
 					.then(function() {
 						return data.documents.reduce(function (current, value, index) {
+							return CommentModel.updateDocument(value);
+						}, Promise.resolve())	;
+					})
+					.then(function() {
+						return data.documents2.reduce(function (current, value, index) {
 							return CommentModel.updateDocument(value);
 						}, Promise.resolve())	;
 					})

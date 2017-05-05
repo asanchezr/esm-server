@@ -213,6 +213,9 @@ angular.module('comment').factory ('CommentModel', ['$q', 'ModelBase', 'moment',
 		getDocuments: function(commentId) {
 			return this.get('/api/comment/' + commentId +'/documents');
 		},
+		getDocuments2: function(commentId) {
+			return this.get('/api/comment/' + commentId +'/documents2');
+		},
 		updateDocument: function(doc) {
 			return this.put('/api/document/' + doc._id, doc);
 		},
