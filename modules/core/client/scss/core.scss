@@ -2624,6 +2624,11 @@ form {
 		&:last-child {
 			margin-bottom: 0;
 		}
+
+		+ .help-block {
+			margin-top: -0.5rem;
+			margin-left: 2rem;
+		}
 	}
 
 	/* Fix - Myriad Pro causes an issue with the label offset so we fix it */
