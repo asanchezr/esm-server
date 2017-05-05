@@ -28,6 +28,10 @@ angular.module ('comment')
 			s.pillarsArray = [];
 			s.showTopicCloud = false;
 
+			s.isJoint = s.period.periodType === 'Joint';
+			s.isPublic = s.period.periodType === 'Public';
+
+
 			var refreshFilterArrays = function(p) {
 				s.period = p;
 
@@ -117,7 +121,9 @@ angular.module ('comment')
 
 			s.displayed = [];
 			s.isLoading = false;
-			s.colspan = ($scope.authentication.user) ? 7 : 6;
+			// columns: all pcp; author, location, date.  eao-pcp adds; pillar, vc.  authentication.user add one for id
+			// public: 3, eao pcp: 5,  +1 for auth user.
+			s.colspan = 3 + (s.isPublic ?  2 : 0) + ($scope.authentication.user ? 1 : 0);
 			s.pageSize = 50;
 
 			// filterByFields
@@ -183,33 +189,39 @@ angular.module ('comment')
 				}
 
 				CommentPeriodModel.getForPublic(s.period._id)
-					.then(function(p) {
-						refreshFilterArrays(p);
-						return CommentModel.getCommentsForPeriod(
-							filterBy.period, filterBy.eaoStatus, filterBy.proponentStatus, filterBy.isPublished,
-							filterByFields.commentId, filterByFields.authorComment, filterByFields.location, filterByFields.pillar, filterByFields.topic,
-							start, limit, sort.predicate, sort.reverse);
-					})
-					.then(function(result) {
-						_.each(result.data, function (item) {
-							var publishedCount = function(item) {
-								_.each(item.documents, function (doc) {
-									if (doc.eaoStatus === 'Published') {
-										publishedCount++;
-									}
-								});
-							};
-							item.publishedDocumentCount = period.userCan.vetComments ? item.documents.length : publishedCount(item);
-							item.authorAndComment = item.isAnonymous ? item.comment : item.author + ' ' + item.comment;
-						});
-
-						s.displayed = result.data;
-						tableState.pagination.start = start;
-						tableState.pagination.totalItemCount = result.count;
-						tableState.pagination.numberOfPages = Math.ceil(result.count / limit); //set the number of pages so the pagination can update
-						s.isLoading = false;
-						$scope.$apply();
+				.then(function(p) {
+					refreshFilterArrays(p);
+					return CommentModel.getCommentsForPeriod(
+						filterBy.period, filterBy.eaoStatus, filterBy.proponentStatus, filterBy.isPublished,
+						filterByFields.commentId, filterByFields.authorComment, filterByFields.location, filterByFields.pillar, filterByFields.topic,
+						start, limit, sort.predicate, sort.reverse);
+				})
+				.then(function(result) {
+					_.each(result.data, function (item) {
+						var publishedCount = function(item) {
+							_.each(item.documents, function (doc) {
+								if (doc.eaoStatus === 'Published') {
+									publishedCount++;
+								}
+							});
+							_.each(item.documents2, function (doc) {
+								if (doc.eaoStatus === 'Published') {
+									publishedCount++;
+								}
+							});
+						};
+						var docCount = item.documents.length + item.documents2.length;
+						item.publishedDocumentCount = period.userCan.vetComments ? docCount : publishedCount(item);
+						item.authorAndComment = item.isAnonymous ? item.comment : item.author + ' ' + item.comment;
 					});
+
+					s.displayed = result.data;
+					tableState.pagination.start = start;
+					tableState.pagination.totalItemCount = result.count;
+					tableState.pagination.numberOfPages = Math.ceil(result.count / limit); //set the number of pages so the pagination can update
+					s.isLoading = false;
+					$scope.$apply();
+				});
 			};
 
 			s.downloadCommentData = function () {
@@ -236,48 +248,48 @@ angular.module ('comment')
 				};
 				// console.log("data:", s.tableParams.data);
 				CommentPeriodModel.getForPublic(s.period._id)
-					.then(function(p) {
-						refreshFilterArrays(p);
-						return CommentModel.getCommentsForPeriod(
-							filterBy.period, filterBy.eaoStatus, filterBy.proponentStatus, filterBy.isPublished,
-							filterByFields.commentId, filterByFields.authorComment, filterByFields.location, filterByFields.pillar, filterByFields.topic,
-							0, s.total, 'commentId', true);
-					})
-					.then(function(result) {
-						CommentModel.prepareCSV(result.data)
-							.then( function (data) {
-								var blob = new Blob([ data ], { type : 'octet/stream' });
-								var filename = (s.eaoStatus) ? s.eaoStatus + ".csv" : 'tableData.csv';
-								var browse = getBrowser();
-								if (browse === 'firefox') {
-									var ff = angular.element('<a/>');
-									ff.css({display: 'none'});
-									angular.element(document.body).append(ff);
-									ff.attr({
-										href: 'data:attachment/csv;charset=utf-8,' + encodeURI(data),
-										target: '_blank',
-										download: filename
-									})[0].click();
-									ff.remove();
-								} else if (browse === 'ie') {
-									window.navigator.msSaveBlob(blob, filename);
-								} else if (browse === 'safari') {
-									var safariBlob = new Blob([ data ], { type : 'text/csv;base64' });
-									var safariUrl = window.webkitURL.createObjectURL( safariBlob );
-									var safariAnchor = document.createElement("a");
-									safariAnchor.href = safariUrl;
-									safariAnchor.click();
-									window.webkitURL.revokeObjectURL(safariUrl);
-								} else {
-									var url = (window.URL || window.webkitURL).createObjectURL( blob );
-									var anchor = document.createElement("a");
-									anchor.download = filename;
-									anchor.href = url;
-									anchor.click();
-									window.URL.revokeObjectURL(url);
-								}
-							});
+				.then(function(p) {
+					refreshFilterArrays(p);
+					return CommentModel.getCommentsForPeriod(
+						filterBy.period, filterBy.eaoStatus, filterBy.proponentStatus, filterBy.isPublished,
+						filterByFields.commentId, filterByFields.authorComment, filterByFields.location, filterByFields.pillar, filterByFields.topic,
+						0, s.total, 'commentId', true);
+				})
+				.then(function(result) {
+					CommentModel.prepareCSV(result.data)
+					.then( function (data) {
+						var blob = new Blob([ data ], { type : 'octet/stream' });
+						var filename = (s.eaoStatus) ? s.eaoStatus + ".csv" : 'tableData.csv';
+						var browse = getBrowser();
+						if (browse === 'firefox') {
+							var ff = angular.element('<a/>');
+							ff.css({display: 'none'});
+							angular.element(document.body).append(ff);
+							ff.attr({
+								href: 'data:attachment/csv;charset=utf-8,' + encodeURI(data),
+								target: '_blank',
+								download: filename
+							})[0].click();
+							ff.remove();
+						} else if (browse === 'ie') {
+							window.navigator.msSaveBlob(blob, filename);
+						} else if (browse === 'safari') {
+							var safariBlob = new Blob([ data ], { type : 'text/csv;base64' });
+							var safariUrl = window.webkitURL.createObjectURL( safariBlob );
+							var safariAnchor = document.createElement("a");
+							safariAnchor.href = safariUrl;
+							safariAnchor.click();
+							window.webkitURL.revokeObjectURL(safariUrl);
+						} else {
+							var url = (window.URL || window.webkitURL).createObjectURL( blob );
+							var anchor = document.createElement("a");
+							anchor.download = filename;
+							anchor.href = url;
+							anchor.click();
+							window.URL.revokeObjectURL(url);
+						}
 					});
+				});
 			};
 
 			// -------------------------------------------------------------------------
@@ -335,11 +347,11 @@ angular.module ('comment')
 						self.ok          = function () { $modalInstance.close (self.comment); };
 						self.pillars     	= self.comment.pillars.map (function (e) { return e; });
 						self.vcs 		   		= self.comment.valuedComponents.map (function (e) { return e.name; });
-						
+
 						self.statusChange = function(status) {
 							self.comment.eaoStatus = status;
 						};
-						
+
 						self.fileStatusChange = function(status, file) {
 							// do not allow a change to Published if it is Rejected and comment is rejected
 							if ('Published' === status && self.comment.eaoStatus === 'Rejected') {
@@ -364,8 +376,8 @@ angular.module ('comment')
 					Promise.resolve()
 					.then(function() {
 						return data.documents.reduce(function (current, value, index) {
-								return CommentModel.updateDocument(value);
-							}, Promise.resolve())	;
+							return CommentModel.updateDocument(value);
+						}, Promise.resolve())	;
 					})
 					.then(function(result) {
 						return CommentModel.save (data);
