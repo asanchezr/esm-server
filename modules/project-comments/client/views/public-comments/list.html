@@ -92,12 +92,13 @@
 			</thead>
 			<tbody>
 
-			<tr class="comment-row clickable"  ng-repeat="o in s.displayed" ng-click="s.detail(o)">
+			<!--  Joint PCP markup. -->
+			<tr class="comment-row clickable" ng-if="s.isJoint" ng-repeat="o in s.displayed" ng-click="s.detail(o)">
 				<td class="comment-row-element" colspan="{{s.colspan}}">
 					<div>
 						<div class="comment-row-element-first-part">
 							<div class="id-col" ng-if="authentication.user">
-								{{ ::o.commentId }}
+								{{ o.commentId }}
 							</div>
 							<div class="author-col">
 									<span class="author-name">
@@ -107,14 +108,6 @@
 							</div>
 							<div class="location-col">
 								{{ ::o.location }}
-							</div>
-							<div class="pillar-col" ng-if="s.isPublic">
-								<span class="tag-list">{{o.pillars.join (', ')}}</span>
-							</div>
-							<div class="vc-col" ng-if="s.isPublic">
-									<span class="tag-list" ng-repeat="x in o.valuedComponents" ng-click="$event.stopPropagation();">
-										<a ui-sref="p.vc.detail({vcId:x})">{{o.topics[$index]}}{{$last ? '' : ', '}}</a>
-									</span>
 							</div>
 							<div class="date-col">
 								<span class="attachment-icon glyphicon glyphicon-paperclip" ng-if="o.publishedDocumentCount > 0" title="{{o.publishedDocumentCount}} attachments available"></span>
@@ -139,48 +132,41 @@
 					</div>
 				</td>
 			</tr>
-			<!--  Original PCP markup. Remove before submission of Joint PCP feature to master ....
-      <tr class="comment-row clickable"  ng-repeat="o in s.displayed" ng-click="s.detail(o)">
-        <td class="id-col no-mobile" ng-if="authentication.user">
-          {{ ::o.commentId }}
-        </td>
-        <td class="author-col">
-          <span class="author-name">
-            <span ng-if="::o.isAnonymous">Anonymous</span>
-            <span ng-if="::!o.isAnonymous">{{ ::o.author }}</span>
-          </span>
-          <div ng-if="s.isPublic">
-            <div ng-if="o.comment" ng-init="toggleProject.desc = (false)">
-              <span class="comment">{{ ::o.comment | maxWords: 20 }}</span>
-            </div>
-          </div>
-          <div ng-if="s.isJoint">
-            <div ng-if="o.comment">
-              <span class="comment">{{ ::o.comment | maxWords: 20 }}</span>
-            </div>
-          </div>
-        </td>
-        <td class="location-col">
-          {{ ::o.location }}
-        </td>
-        <td class="pillar-col" ng-if="s.isPublic">
-          <span class="tag-list">{{o.pillars.join (', ')}}</span>
-        </td>
-        <td class="vc-col" ng-if="s.isPublic">
-          <span class="tag-list" ng-repeat="x in o.valuedComponents" ng-click="$event.stopPropagation();">
-            <a ui-sref="p.vc.detail({vcId:x})">{{o.topics[$index]}}{{$last ? '' : ', '}}</a>
-          </span>
-        </td>
-        <td class="date-col">
-          <span class="attachment-icon glyphicon glyphicon-paperclip" ng-if="o.publishedDocumentCount > 0" title="{{o.publishedDocumentCount}} attachments available"></span>
-          <span class="date">{{o.dateAdded | date:'MMM dd, yyyy @ h:mm a'}}</span>
-        </td>
-      </tr>
-      -->
+			<!--  Provincial only PCP markup. -->
+      <tr class="comment-row clickable" ng-if="s.isPublic" ng-repeat="o in s.displayed" ng-click="s.detail(o)">
+				<td class="id-col no-mobile" ng-if="authentication.user">
+					{{ ::o.commentId }}
+				</td>
+				<td class="author-col">
+						<span class="author-name">
+							<span ng-if="::o.isAnonymous">Anonymous</span>
+							<span ng-if="::!o.isAnonymous">{{ ::o.author }}</span>
+						</span>
+					<div ng-if="o.comment" ng-init="toggleProject.desc = (false)">
+						<span class="comment">{{ ::o.comment | maxWords: 20 }}</span>
+					</div>
+				</td>
+				<td class="location-col">
+					{{ ::o.location }}
+				</td>
+				<td class="pillar-col">
+					<span class="tag-list">{{o.pillars.join (', ')}}</span>
+				</td>
+				<td class="vc-col">
+						<span class="tag-list" ng-repeat="x in o.valuedComponents" ng-click="$event.stopPropagation();">
+							<a ui-sref="p.vc.detail({vcId:x})">{{o.topics[$index]}}{{$last ? '' : ', '}}</a>
+						</span>
+				</td>
+				<td class="date-col">
+					<span class="attachment-icon glyphicon glyphicon-paperclip" ng-if="o.publishedDocumentCount > 0" title="{{o.publishedDocumentCount}} attachments available"></span>
+					<span class="date">{{o.dateAdded | date:'MMM dd, yyyy @ h:mm a'}}</span>
+				</td>
+			</tr>
 
 			<tr ng-if="!s.displayed || s.displayed.length === 0">
 				<td colspan="{{s.colspan -1}}">No records found.</td>
 			</tr>
+
 			</tbody>
 			<tfoot>
 			<tr>
