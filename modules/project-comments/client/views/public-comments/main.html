@@ -49,8 +49,8 @@
 
 		<!-- Documents -->
 		<div class="tab-pane" id="pcpDocuments">
-			<tmpl-period-documents-list x-file-list="period.relatedDocuments"></tmpl-period-documents-list>
-			<tmpl-period-documents-list ng-if="isJoint" x-file-list="period.relatedDocumentsPackage2"></tmpl-period-documents-list>
+			<tmpl-period-documents-list x-can-modify="false" x-file-list="period.relatedDocuments"></tmpl-period-documents-list>
+			<tmpl-period-documents-list x-can-modify="false" ng-if="isJoint" x-file-list="period.relatedDocumentsPackage2"></tmpl-period-documents-list>
 		</div><!-- / Documents Tab -->
 
 
