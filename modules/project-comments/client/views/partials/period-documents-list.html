@@ -1,6 +1,6 @@
 <div class="fb-body">
-    <div class="fb-list">
-        <div class="column-header">
+    <div class="fb-list pcp-linked-documents">
+        <div class="column-header" ng-hide="ctrl.sortedFiles.length == 0">
             <div class="fb-col-group">
                 <div class="col name-col first-col sortable" ng-class="{'descending': !ctrl.sorting.ascending}" ng-click="ctrl.sortBy('name')">
                     <span>Name</span>
@@ -21,7 +21,7 @@
             </div>
         </div>
         <ul>
-            <li class="fb-list-item" ng-hide="ctrl.sortedFiles.length > 0">
+            <li class="fb-list-item no-results" ng-hide="ctrl.sortedFiles.length > 0">
                 <span class="fb-col-group">
                     <span class="col first-col">No Linked Files.</span>
                 </span>
@@ -61,3 +61,4 @@
             </li>
         </ul>
     </div>
+</div>
