@@ -1,27 +1,26 @@
 <div class="modal-header">
     <button type="button" class="btn btn-default close" ng-click="ctrl.cancel()"><span aria-hidden="true">&times;</span></button>
-    <h3 class="modal-title">Create a Public Comment Period</h3>
+    <h3 class="modal-title">Select a Comment Period Type</h3>
 </div>
 
 <div class="modal-body">
     <div class="radio-group">
-        <label>
-            <input type="radio" name="periodTypeOptions" ng-model="ctrl.periodType" id="radio1" value="Public" /> Standard Public Comment Period
-        </label>
-        <div style="opacity: 1; line-height: 16px; color: rgb(153, 153, 153); font-size: 12px; font-weight: bold; text-align: left; width: 300px; height: 16px;">
-            <p>Description about this type of comment period</p>
+        <div class="form-group">
+            <label>
+                <input type="radio" name="periodTypeOptions" ng-model="ctrl.periodType" id="radio1" value="Public" /> Standard Public Comment Period
+            </label>
+            <span class="help-block">Description about this type of comment period</span>
         </div>
+        <div class="form-group">
         <label>
             <input type="radio"	name="periodTypeOptions" ng-model="ctrl.periodType" id="radio2" value="Joint" /> Joint Public Comment Period
         </label>
-        <br>
-        <div style="opacity: 1; line-height: 16px; color: rgb(153, 153, 153); font-size: 12px; font-weight: bold; text-align: left; width: 300px; height: 16px;">
-            <p>Description about this type of comment period</p>
+        <span class="help-block">Description about this type of comment period</span>
         </div>
     </div>
 </div>
 
 <div class="modal-footer">
     <button class="btn btn-default" type="button" ng-click="ctrl.cancel()">Cancel</button>
-    <button class="btn btn-primary" type="button" ng-click="ctrl.ok()">Create</button>
+    <button class="btn btn-primary" type="button" ng-click="ctrl.ok()">OK</button>
 </div>

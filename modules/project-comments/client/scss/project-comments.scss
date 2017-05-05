@@ -13,6 +13,20 @@ $pcp-pending-badge-bg: #666;
 $pcp-closed-badge-bg: #5cb85c;
 $pcp-comment-icon-color: #ccc;
 
+
+// Comment Period View Containers 
+.comment-period-view {
+    .pcp-edit-view {
+        @include flexbox();
+        @include flexdirection(column);
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+    }
+}
+
 .pcp-alert-container {
     margin-bottom: 2rem;
 }
@@ -545,5 +559,68 @@ $pcp-comment-icon-color: #ccc;
     .date-col {
         width: 18rem;
         font-weight: 700;
+    }
+}
+
+// Joint PCP 
+.pcp-joint {
+    .tab-pane {
+        padding-top: 3.5rem;
+    }
+
+    textarea {
+        resize: none;
+    }
+
+    section {
+        margin-bottom: 4rem;
+
+        h2 {
+            margin-bottom: 2rem;
+            font-size: 2rem;
+
+            + .help-block {
+                margin-top: -1.75rem;
+                margin-bottom: 1rem;
+            }
+        }
+    }
+
+    .set-pcp-date-range {
+        .form-group {
+            margin-right: 2rem;
+            min-width: 17rem;
+        }
+    }
+
+    .form-footer {
+        padding-top: 2.5rem;
+        border-top: 4px solid #ddd;
+    }
+
+    .pcp-role-list {
+        margin-top: 1.5rem;
+        padding: 0;
+        list-style-type: none;
+
+        li {
+            padding: 1.25rem;
+            border-bottom: 1px solid #eee;
+            background: #fff;
+
+            &.no-results {
+                font-weight: bold;
+                background-color: #ddd;
+            }
+        }
+    }
+
+    .pcp-linked-documents {
+        li {
+            &.no-results {
+                font-weight: bold;
+                background-color: #ddd;
+            }
+        }
     }
 }

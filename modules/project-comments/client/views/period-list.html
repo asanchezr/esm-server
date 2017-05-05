@@ -38,7 +38,8 @@
 			<tr ng-repeat="p in $data" ng-if="project.userCan.createCommentPeriod || p.isPublished"  ui-sref="p.commentperiod.detail({periodId:p._id})">
 				<td class="date-col" header-class="'date-col'" title="'Start Date'"
 					sortable="'dateStarted'">
-					{{ p.dateStarted | date : format : timezone }}
+					<span>{{ p.dateStarted | date : format : timezone }}</span>
+					<span title="To be determined" ng-if="!p.dateStarted">TBD</span>
 				</td>
 				<td class="details-col" header-class="'details-col'" title="'Details'"
 					sortable="'informationLabel'">
