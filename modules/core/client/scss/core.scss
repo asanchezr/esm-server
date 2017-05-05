@@ -2618,9 +2618,24 @@ form {
 .radio-group {
 	padding-top: 0.7rem;
 
+	label {
+		margin-bottom: 0.5rem;
+
+		&:last-child {
+			margin-bottom: 0;
+		}
+
+		+ .help-block {
+			margin-top: -0.5rem;
+			margin-left: 2rem;
+		}
+	}
+
 	/* Fix - Myriad Pro causes an issue with the label offset so we fix it */
 	input[type="radio"] {
-		margin-top: 2px;
+		margin-top: -0.2rem;
+		margin-right: 0.5rem;
+		vertical-align: middle;
 	}
 }
 

@@ -413,6 +413,17 @@ module.exports = DBModel.extend ({
 				.then (resolve, reject);
 		});
 	},
+	getCommentJointDocuments: function(id) {
+		var self = this;
+		var doc = new DocumentClass (this.opts);
+		return new Promise (function (resolve, reject) {
+			self.one({_id : id})
+			.then(function(c) {
+				return doc.getList(c.documents2);
+			})
+			.then (resolve, reject);
+		});
+	},
 	updatePermissionBatch: function(projectId, periodId, skip, limit) {
 		var self = this;
 		var projectCtrl = new ProjectController(this.opts);
