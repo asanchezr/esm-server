@@ -90,7 +90,6 @@ $pcp-comment-icon-color: #ccc;
             
             th {
                 display: inline-block;
-                width: 50%;
                 text-align: center !important;
 
                 &.count-col,
@@ -458,11 +457,6 @@ $pcp-comment-icon-color: #ccc;
             display: table-row;
         }
 
-        .author-col,
-        .date-col {
-            width: 50%;
-        }
-
         .date-col {
             text-align: right;
         }
@@ -495,7 +489,7 @@ $pcp-comment-icon-color: #ccc;
     }
 
     .date-col {
-        width: 15rem;
+        width: 16rem;
         text-align: right;
     }
 

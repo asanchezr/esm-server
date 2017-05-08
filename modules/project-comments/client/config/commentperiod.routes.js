@@ -659,8 +659,8 @@ angular.module('comment').config(['$stateProvider', 'moment', "_", function ($st
 			$scope.hasErrors = false;
 
 			// Placeholder text for Package 1 (i.e. Provincial) of Joint PCPs
-			period.informationLabel = 'Blah Blah';
-			period.informationLabelPackage2 = 'Yada Yada';
+			period.informationLabel = 'Draft Assessment Report';
+			period.informationLabelPackage2 = ' ';
 			period.commenterRoles = ['public'];
 
 			commonSetup($timeout, $scope, period, project, CodeLists, CommentPeriodModel);

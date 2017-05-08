@@ -241,7 +241,7 @@ angular.module('comment').factory ('CommentModel', ['$q', 'ModelBase', 'moment',
 			function attachmentFormat(documents,arrayJoinChar) {
 				return documents.map (function (v) {
 					return '""' + window.location.protocol + '//' + window.location.host + '/api/document/'+v._id+'/fetch""';
-				}).join (arrayJoinChar)
+				}).join (arrayJoinChar);
 			}
 			return new Promise (function (resolve, reject) {
 				var data = "";
