@@ -34,7 +34,7 @@
 	<div class="actions pull-right">
 		<button class="btn btn-default btn-sm" ng-if="s.isPublic && s.showTopicCloud === false" data-toggle="modal" data-target="#commentModal"
 		 data-backdrop="false">Count by Valued Component</button>
-		<button class="btn btn-default btn-sm" ng-if="authentication.user" ng-click="s.downloadCommentData()"><span class="glyphicon glyphicon-download-alt"></span><span>Download CSV</span></button>
+		<button class="btn btn-default btn-sm" ng-if="authentication.user" ng-click="s.downloadCommentData(s.isJoint)"><span class="glyphicon glyphicon-download-alt"></span><span>Download CSV</span></button>
 	</div>
 </div>
 

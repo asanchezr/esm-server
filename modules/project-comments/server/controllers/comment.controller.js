@@ -413,7 +413,7 @@ module.exports = DBModel.extend ({
 				.then (resolve, reject);
 		});
 	},
-	getCommentJointDocuments: function(id) {
+	getCommentDocuments2: function(id) {
 		var self = this;
 		var doc = new DocumentClass (this.opts);
 		return new Promise (function (resolve, reject) {
