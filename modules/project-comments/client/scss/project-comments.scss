@@ -572,6 +572,25 @@ $pcp-comment-icon-color: #ccc;
     }
 }
 
+// Related Documents Tab
+.pcp-related-docs {
+    padding-top: 1.5rem;
+
+    h2 {
+        margin-bottom: 2rem;
+        font-size: 2rem;
+    }
+
+    P {
+        margin-bottom: 2.5rem;
+    }
+
+    section {
+        margin-bottom: 4rem;
+    }
+}
+
+
 // Joint PCP 
 .pcp-joint {
     .tab-pane {

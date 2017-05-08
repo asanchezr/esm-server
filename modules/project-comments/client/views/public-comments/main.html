@@ -35,22 +35,32 @@
 	</div>
 
     <ul class="nav nav-tabs" role="tablist">
-        <li class="active" role="presentation"><a href="#pcpComments" aria-controls="pcpComments" role="tab" data-toggle="tab">Comments</a></li>
-        <li role="presentation"><a href="#pcpDocuments" aria-controls="pcpDocuments" role="tab" data-toggle="tab">Related Documents</a></li>
+		<li class="active" role="presentation"><a href="#pcpDocuments" aria-controls="pcpDocuments" role="tab" data-toggle="tab">Related Documents</a></li>
+        <li role="presentation"><a href="#pcpComments" aria-controls="pcpComments" role="tab" data-toggle="tab">View Comments</a></li>
 		<li role="presentation" ng-if="isPublic"><a href="#pcpOpenHouse" aria-controls="pcpOpenHouse" role="tab" data-toggle="tab">Open Houses</a></li>
     </ul>
 
     <div class="pcp-tab-content tab-content">
 
 		<!-- Comments -->
-		<div class="tab-pane active" role="tab-panel" id="pcpComments">
-				<tmpl-public-comment-list x-period="period" x-project="project"></tmpl-public-comment-list>
+		<div class="tab-pane" role="tab-panel" id="pcpComments">
+			<tmpl-public-comment-list x-period="period" x-project="project"></tmpl-public-comment-list>
 		</div><!-- / Comments Tab -->
 
 		<!-- Documents -->
-		<div class="tab-pane" id="pcpDocuments">
-			<tmpl-period-documents-list x-can-modify="false" x-file-list="period.relatedDocuments"></tmpl-period-documents-list>
-			<tmpl-period-documents-list x-can-modify="false" ng-if="isJoint" x-file-list="period.relatedDocumentsPackage2"></tmpl-period-documents-list>
+		<div class="tab-pane active" id="pcpDocuments">
+			<div class="pcp-related-docs">
+				<section>
+					<h2>{{period.informationLabel}}</h2>
+					<p>{{period.additionalText}}</p>
+					<tmpl-period-documents-list x-file-list="period.relatedDocuments"></tmpl-period-documents-list>
+				</section>
+				<section>
+					<h2>{{period.informationLabelPackage2}}</h2>
+					<p>{{period.additionalTextPackage2}}</p>
+					<tmpl-period-documents-list ng-if="isJoint" x-file-list="period.relatedDocumentsPackage2"></tmpl-period-documents-list>
+				</section>
+			</div>
 		</div><!-- / Documents Tab -->
 
 
