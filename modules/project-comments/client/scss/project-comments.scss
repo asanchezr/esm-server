@@ -429,123 +429,151 @@ $pcp-comment-icon-color: #ccc;
 	}
 }
 
+
 // Comments Table
-.comment-table {
-    .id-col {
-        width: 5rem;
-        text-align: center;
+.pcp-comment-table {
+    table-layout: auto !important;
+
+    table {
+
+        > tbody {
+            > tr {
+                border: none;
+
+                > td {
+                    padding-top: 1.5rem;
+                    padding-bottom: 1.5rem;
+                    border: none;
+                    vertical-align: top;
+                }
+            }
+        }
     }
 
-    .author-col {
-        .author-name {
-            display: block;
-            padding-right: 15rem;
-            overflow: hidden;
-            white-space: nowrap;
-            text-overflow: ellipsis;
-            font-weight: bold;
+    thead {
+        display: table;
+        width: 100%;
+
+        tr {
+            display: table-row;
         }
-    }  
+
+        .author-col,
+        .date-col {
+            width: 50%;
+        }
+
+        .date-col {
+            text-align: right;
+        }
+    }
+
+    tr {
+        display: block;
+
+        &.pcp-comment-cols {
+            @include flexbox();
+            width: 100%;
+        }
+    }
+
+    h3 {
+        margin: 0;
+        font-size: 1.6rem;
+        font-weight: bold;
+    }
+
+    h4 {
+        margin-top: 0;
+        margin-bottom: 1rem;
+        font-size: 1.4rem;
+        font-weight: bold;
+    }
+
+    td.author-col {
+        @include flex(1 1 auto);
+    }
 
     .date-col {
-        width: 16rem; 
+        width: 15rem;
         text-align: right;
     }
 
-    .attachment-icon {
-        margin-top: -0.4rem;
-        margin-right: 1rem;
-        vertical-align: middle;
+    td.date-col {
+        @include flex(0 0 auto);
+        white-space: nowrap;
+        font-size: 1.2rem;
     }
 
-    .comment {
-        display: block;
-        margin-top: 1rem;
+    .pillar-col,
+    .vc-col,
+    .location-col {
+        display: none;
+    }
+    
+    .id-col {
+        width: 6rem;
+    }
+
+    .location-col {
+        width: 20rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 }
 
-@media (max-width: 460px) {
-    .comment-table {
-        id-col {
-            width: 5rem;
+
+@media (min-width: 640px) {
+    .pcp-comment-table {
+        thead {
+            display: table-header-group;
+            
+            .author-col {
+                width: auto;
+            }
+
+            .date-col {
+                width: 18rem;
+            }
         }
-    }
-}
 
-@media (max-width: 1199px) {
-    .comment-table {
-        display: block;
+        tr {
+            display: table-row;
 
-        thead, tfoot {
-            display: table;
-            width: 100%;
-
-            tr {
+            &.pcp-comment-cols {
                 display: table-row;
             }
         }
 
-        tbody {
-            display: block;
-
-            tr {
-                position: relative;
-                display: block;
-            }
-        } 
-
-        .location-col,
-        .pillar-col,
-        .vc-col {
-            display: none;
-        }
-
-        td.date-col {
-            position: absolute;
-            top: 0;
-            right: 0;
-
-            .date {
-                margin-top: 1px;
-                font-size: 1.1rem;
-            }
-        }
-    }
-}
-
-@media (min-width: 760px) {
-    .comment-table {
-        .id-col {
-            width: 8rem;
+        .location-col {
+            display: table-cell;
+            width: 18rem;
         }
 
         .date-col {
-            width: 20rem;
+            width: 18rem;
+        }
+
+        td.date-col {
+            font-size: 1.4rem;
         }
     }
 }
 
 @media (min-width: 1200px) {
-    .comment-table { 
-        .location-col {
-            width: 12rem;
-            overflow: hidden;
-            text-overflow: ellipsis;
+    .pcp-comment-table {
+        .vc-col {
+            display: table-cell;
+            width: 30rem
         }
 
         .pillar-col {
-            width: 11rem;
-        }
-
-        .vc-col {
-            width: 15rem;
+            display: table-cell;
+            width: 10rem;
         }
     }
 }
 
-.pcp-date {
-    max-width: 100%;
-}
 
 // Open House Dates
 .open-house-table {
