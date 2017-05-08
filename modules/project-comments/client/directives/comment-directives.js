@@ -224,7 +224,8 @@ angular.module ('comment')
 				});
 			};
 
-			s.downloadCommentData = function () {
+			s.downloadCommentData = function (isJoint) {
+				console.log("download comment data ", isJoint);
 				var getBrowser = function() {
 
 					var userAgent = window.navigator.userAgent;
@@ -256,7 +257,7 @@ angular.module ('comment')
 						0, s.total, 'commentId', true);
 				})
 				.then(function(result) {
-					CommentModel.prepareCSV(result.data)
+					CommentModel.prepareCSV(result.data, isJoint)
 					.then( function (data) {
 						var blob = new Blob([ data ], { type : 'octet/stream' });
 						var filename = (s.eaoStatus) ? s.eaoStatus + ".csv" : 'tableData.csv';

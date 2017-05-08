@@ -112,7 +112,7 @@ module.exports = function (app) {
 	}));
 	app.route ('/api/comment/:commentId/documents2').all(policy ('guest'))
 	.get (routes.setAndRun (CommentModel, function (model, req) {
-		return model.getCommentJointDocuments(req.params.commentId);
+		return model.getCommentDocuments2(req.params.commentId);
 	}));
 
 	// special delete method
