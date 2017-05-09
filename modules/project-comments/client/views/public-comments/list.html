@@ -11,13 +11,13 @@
 <!-- Temporary fix until we move to angular modals -->
 <div class="temp-overlay"></div>
 
-<div class="pcp-comment-actions-bar">
-	<span class="pcp-comment-count-label" 
+<div class="pcp-comment-actions-bar clearfix">
+	<h2 class="pcp-comment-count-label pull-left" 
 		ng-if="s.period.userCan.classifyComments && s.period.userCan.vetComments">Total Comments (<span>{{s.total}}</span><span ng-if="!s.total">0</span>)
-	</span>
-	<span class="pcp-comment-count-label"
+	</h2>
+	<h2 class="pcp-comment-count-label pull-left"
 		ng-if="!s.period.userCan.classifyComments && !s.period.userCan.vetComments">Total Comments (<span>{{s.totalPublished}}</span><span ng-if="!s.totalPublished">0</span>)
-	</span>
+	</h2>
 	<div class="actions pull-right">
 		<button class="btn btn-default btn-sm" 
 			ng-if="s.isPublic && s.showTopicCloud === false" data-toggle="modal" data-target="#commentModal"

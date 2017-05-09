@@ -38,7 +38,7 @@
 
     <ul class="nav nav-tabs" role="tablist">
 		<li class="active" role="presentation"><a href="#pcpDocuments" aria-controls="pcpDocuments" role="tab" data-toggle="tab">Related Documents</a></li>
-        <li role="presentation"><a href="#pcpComments" aria-controls="pcpComments" role="tab" data-toggle="tab">View Comments</a></li>
+        <li role="presentation"><a href="#pcpComments" aria-controls="pcpComments" role="tab" data-toggle="tab">Comments</a></li>
 		<li role="presentation" ng-if="isPublic"><a href="#pcpOpenHouse" aria-controls="pcpOpenHouse" role="tab" data-toggle="tab">Open Houses</a></li>
     </ul>
 
@@ -54,17 +54,18 @@
 			<div class="pcp-related-docs">
 				<section>
 					<h2>{{period.informationLabel}}</h2>
+					<p ng-if="period.informationLabelPackage2">The purpose of this comment period is for the public to see EAO’s draft conclusions before a decision is made, and be able to see how their comments in previous public comment periods have been addressed. Following the public comment period, EAO’s draft assessment report and/or conditions may be adjusted, if necessary, in response to the public comments.</p>
 					<p>{{period.additionalText}}</p>
 					<tmpl-period-documents-list x-file-list="period.relatedDocuments"></tmpl-period-documents-list>
 				</section>
-				<section>
+				<section ng-if="period.informationLabelPackage2">
 					<h2>{{period.informationLabelPackage2}}</h2>
+					<p>EAO will forward comments related to matters of federal concern to the Canadian Environmental Assessment Agency for consideration. CEAA will review all submitted comments before finalizing their report/conditions.</p>
 					<p>{{period.additionalTextPackage2}}</p>
 					<tmpl-period-documents-list ng-if="isJoint" x-file-list="period.relatedDocumentsPackage2"></tmpl-period-documents-list>
 				</section>
 			</div>
 		</div><!-- / Documents Tab -->
-
 
 		<!-- Open House Dates -->
 		<div class="tab-pane" ng-if="isPublic" role="tab-panel" id="pcpOpenHouse">

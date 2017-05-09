@@ -431,16 +431,16 @@ $pcp-comment-icon-color: #ccc;
 
 // Comments Table
 .pcp-comment-actions-bar {
-    margin-top: -1rem;
     padding-bottom: 1.5rem;
 
     .pcp-comment-count-label {
-        font-size: 1.6rem;
+        margin: 0;
+        font-size: 2rem;
         font-weight: bold;
     }
 
     .actions {
-        margin-top: -0.5rem;
+        margin-top: -1rem;
 
         .btn {
             padding: 0.65rem 1rem;
@@ -653,12 +653,12 @@ $pcp-comment-icon-color: #ccc;
 // Related Documents Tab
 .pcp-related-docs {
     h2 {
-        margin-bottom: 2rem;
+        margin-bottom: 1.5rem;
         font-size: 2rem;
     }
 
     P {
-        margin-bottom: 2.5rem;
+        margin-bottom: 1.5rem;
     }
 
     section {
