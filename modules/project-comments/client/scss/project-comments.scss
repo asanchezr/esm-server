@@ -446,6 +446,10 @@ $pcp-comment-icon-color: #ccc;
             padding: 0.65rem 1rem;
         }
     }
+
+    + .tab-pane {
+        padding-top: 0;
+    }
 }
 
 .pcp-comment-filter-bar {

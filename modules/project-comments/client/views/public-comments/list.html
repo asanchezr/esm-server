@@ -12,10 +12,15 @@
 <div class="temp-overlay"></div>
 
 <div class="pcp-comment-actions-bar">
-	<span class="pcp-comment-count-label" ng-if="s.period.userCan.classifyComments && s.period.userCan.vetComments">Total Comments (<span>{{s.total}}</span><span ng-if="!s.total">0</span>)
-	<span class="pcp-comment-count-label" ng-if="!s.period.userCan.classifyComments && !s.period.userCan.vetComments">Total Comments (<span>{{s.totalPublished}}</span><span ng-if="!s.totalPublished">0</span>)
+	<span class="pcp-comment-count-label" 
+		ng-if="s.period.userCan.classifyComments && s.period.userCan.vetComments">Total Comments (<span>{{s.total}}</span><span ng-if="!s.total">0</span>)
+	</span>
+	<span class="pcp-comment-count-label"
+		ng-if="!s.period.userCan.classifyComments && !s.period.userCan.vetComments">Total Comments (<span>{{s.totalPublished}}</span><span ng-if="!s.totalPublished">0</span>)
+	</span>
 	<div class="actions pull-right">
-		<button class="btn btn-default btn-sm" ng-if="s.isPublic && s.showTopicCloud === false" data-toggle="modal" data-target="#commentModal"
+		<button class="btn btn-default btn-sm" 
+			ng-if="s.isPublic && s.showTopicCloud === false" data-toggle="modal" data-target="#commentModal"
 			data-backdrop="false">Count by Valued Component
 		</button>
 		<button class="btn btn-default btn-sm" ng-if="authentication.user" ng-click="s.downloadCommentData(s.isJoint)">
@@ -45,7 +50,7 @@
 		</ul>
 	</div>
 	<select class="form-control pull-left"
-		ng-if="s.period.periodType === 'Joint'">
+		ng-if="s.isJoint">
 		<option>All Comments</option>
 		<option>All Comments</option>
 		<option>All Comments</option>
@@ -53,8 +58,9 @@
 </div>
 
 <!-- Joint PCP Filters (Public) -->
+<!-- TODO: This needs to be viewable to PUBLIC only and JOINT PCP TYPE -->
 <div class="pcp-comment-filter-bar clearfix" 
-	ng-if="s.period.periodType === 'Joint' && !s.period.userCan.classifyComments && !s.period.userCan.vetComments">
+	ng-if="s.isJoint && !s.period.userCan.classifyComments && !s.period.userCan.vetComments">
 	<label class="pull-left">Filter by</label>
 	<select class="form-control pull-left">
 		<option>All Comments</option>
