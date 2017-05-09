@@ -11,31 +11,56 @@
 <!-- Temporary fix until we move to angular modals -->
 <div class="temp-overlay"></div>
 
-<div class="clearfix">
-	<div class="pull-left">
-		<div ng-if="s.period.userCan.vetComments">
-			<!-- PROTOTYPE EAO ROW TEMPLATES  -->
-			<ul class="tab-container nav nav-pills" role="tablist">
-				<li role="presentation" class="active"><a href ng-click="s.toggle('Unvetted')" role="tab" data-toggle="tab">Pending Review ({{s.totalPending}})</a></li>
-				<li role="presentation"><a href ng-click="s.toggle('Deferred')" role="tab" data-toggle="tab">Deferred ({{s.totalDeferred}})</a></li>
-				<li role="presentation"><a href ng-click="s.toggle('Published')" role="tab" data-toggle="tab">Published ({{s.totalPublic}})</a></li>
-				<li role="presentation"><a href ng-click="s.toggle('Rejected')" role="tab" data-toggle="tab">Rejected ({{s.totalRejected}})</a></li>
-			</ul>
-		</div>
-		<div ng-if="s.period.userCan.classifyComments && !s.period.userCan.vetComments">
-			<!-- PROPONENT TEMPLATES  -->
-			<ul class="tab-container nav nav-pills" role="tablist">
-				<li role="presentation" class="active"><a href role="tab" data-toggle="tab" ng-click="s.toggleP('Unclassified')">Unassigned ({{s.totalUnassigned}})</a></li>
-				<li role="presentation"><a href role="tab" data-toggle="tab" ng-click="s.toggleP('Classified')">Assigned ({{s.totalAssigned}})</a></li>
-			</ul>
-		</div>
-		<span class="pcp-comment-count-label" ng-if="!s.period.userCan.classifyComments && !s.period.userCan.vetComments">Total Comments ({{s.totalPublished}})</span>
-	</div>
+<div class="pcp-comment-actions-bar">
+	<span class="pcp-comment-count-label" ng-if="s.period.userCan.classifyComments && s.period.userCan.vetComments">Total Comments (<span>{{s.total}}</span><span ng-if="!s.total">0</span>)
+	<span class="pcp-comment-count-label" ng-if="!s.period.userCan.classifyComments && !s.period.userCan.vetComments">Total Comments (<span>{{s.totalPublished}}</span><span ng-if="!s.totalPublished">0</span>)
 	<div class="actions pull-right">
 		<button class="btn btn-default btn-sm" ng-if="s.isPublic && s.showTopicCloud === false" data-toggle="modal" data-target="#commentModal"
-		 data-backdrop="false">Count by Valued Component</button>
-		<button class="btn btn-default btn-sm" ng-if="authentication.user" ng-click="s.downloadCommentData(s.isJoint)"><span class="glyphicon glyphicon-download-alt"></span><span>Download CSV</span></button>
+			data-backdrop="false">Count by Valued Component
+		</button>
+		<button class="btn btn-default btn-sm" ng-if="authentication.user" ng-click="s.downloadCommentData(s.isJoint)">
+			<span class="glyphicon glyphicon-download-alt"></span><span>Download CSV</span>
+		</button>
 	</div>
+</div>
+
+<!-- ADMIN FILTER BAR -->
+<div class="pcp-comment-filter-bar clearfix" 
+	ng-if="s.period.userCan.classifyComments && s.period.userCan.vetComments">
+	<div ng-if="s.period.userCan.vetComments">
+		<label class="pull-left">Filter by</label>
+		<!-- PROTOTYPE EAO ROW TEMPLATES  -->
+		<ul class="toggle-tabs tab-container pull-left clearfix" role="tablist">
+			<li class="active" role="presentation"><a class="btn btn-default btn-sm" ng-click="s.toggle('Unvetted')" role="tab" data-toggle="tab">Pending Review ({{s.totalPending}})</a></li>
+			<li role="presentation"><a class="btn btn-default btn-sm" ng-click="s.toggle('Deferred')" role="tab" data-toggle="tab">Deferred ({{s.totalDeferred}})</a></li>
+			<li role="presentation"><a class="btn btn-default btn-sm" ng-click="s.toggle('Published')" role="tab" data-toggle="tab">Published ({{s.totalPublic}})</a></li>
+			<li role="presentation"><a class="btn btn-default btn-sm" ng-click="s.toggle('Rejected')" role="tab" data-toggle="tab">Rejected ({{s.totalRejected}})</a></li>
+		</ul>
+	</div>
+	<div ng-if="s.period.userCan.classifyComments && !s.period.userCan.vetComments">
+		<!-- PROPONENT TEMPLATES  -->
+		<ul class="tab-container nav nav-pills" role="tablist">
+			<li role="presentation" class="active"><a href role="tab" data-toggle="tab" ng-click="s.toggleP('Unclassified')">Unassigned ({{s.totalUnassigned}})</a></li>
+			<li role="presentation"><a href role="tab" data-toggle="tab" ng-click="s.toggleP('Classified')">Assigned ({{s.totalAssigned}})</a></li>
+		</ul>
+	</div>
+	<select class="form-control pull-left"
+		ng-if="s.period.periodType === 'Joint'">
+		<option>All Comments</option>
+		<option>All Comments</option>
+		<option>All Comments</option>
+	</select>
+</div>
+
+<!-- Joint PCP Filters (Public) -->
+<div class="pcp-comment-filter-bar clearfix" 
+	ng-if="s.period.periodType === 'Joint' && !s.period.userCan.classifyComments && !s.period.userCan.vetComments">
+	<label class="pull-left">Filter by</label>
+	<select class="form-control pull-left">
+		<option>All Comments</option>
+		<option>All Comments</option>
+		<option>All Comments</option>
+	</select>
 </div>
 
 <div class="tab-pane">
@@ -90,9 +115,6 @@
 						</select>
 					</th>
 					<th class="date-col">
-						<!--
-						<input class="form-control" st-search="dateAdded" ng-model="s.filterByFields.dateAdded" />
-						-->
 					</th>
 				</tr>
 
@@ -184,7 +206,7 @@
 					</td>
 				</tr>
 
-				<tr ng-if="!s.displayed || s.displayed.length === 0">
+				<tr class="no-records" ng-if="!s.displayed || s.displayed.length === 0">
 					<td colspan="{{s.colspan}}">No records found.</td>
 				</tr>
 			</tbody>

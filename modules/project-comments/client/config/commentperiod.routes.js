@@ -934,7 +934,7 @@ angular.module('comment').config(['$stateProvider', 'moment', "_", function ($st
 		}
 
 		function instructions(project, period, CommentPeriodModel) {
-			var template = "Comment Period on the %INFORMATION_LABEL_PACKAGE_1% and the %INFORMATION_LABEL_PACKAGE_2% for the %PROJECT_NAME% Project.";
+			var template = "This Public Comment Period is regarding the %INFORMATION_LABEL_PACKAGE_1% and the %INFORMATION_LABEL_PACKAGE_2%.";
 
 			var PROJECT_NAME = project.name || '%PROJECT_NAME%';
 			var INFORMATION_LABEL_PACKAGE_1 = period.informationLabel || '%INFORMATION_LABEL_PACKAGE_1%';

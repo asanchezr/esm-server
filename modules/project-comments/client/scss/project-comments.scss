@@ -90,6 +90,7 @@ $pcp-comment-icon-color: #ccc;
             
             th {
                 display: inline-block;
+                width: 50%;
                 text-align: center !important;
 
                 &.count-col,
@@ -428,20 +429,65 @@ $pcp-comment-icon-color: #ccc;
 	}
 }
 
-
 // Comments Table
+.pcp-comment-actions-bar {
+    margin-top: -1rem;
+    padding-bottom: 1.5rem;
+
+    .pcp-comment-count-label {
+        font-size: 1.6rem;
+        font-weight: bold;
+    }
+
+    .actions {
+        margin-top: -0.5rem;
+
+        .btn {
+            padding: 0.65rem 1rem;
+        }
+    }
+}
+
+.pcp-comment-filter-bar {
+    padding: 1.25rem;
+    background: #fff;
+
+    label {
+        padding: 0.65rem 0;
+        margin-bottom: 0;
+        margin-right: 1rem;
+    }
+
+    .btn {
+        padding: 0.7rem 1rem;
+    }
+
+    .toggle-tabs {
+        margin-right: 1rem;
+    }
+
+    select {
+        width: 20rem;
+        font-size: 1.2rem;
+        font-weight: bold;
+    }
+
+    + .tab-pane {
+        padding-top: 0;
+    }
+}
+
 .pcp-comment-table {
     table-layout: auto !important;
 
     table {
-
         > tbody {
             > tr {
                 border: none;
 
                 > td {
                     padding-top: 1.5rem;
-                    padding-bottom: 1.5rem;
+                    padding-bottom: 1.25rem;
                     border: none;
                     vertical-align: top;
                 }
@@ -497,6 +543,11 @@ $pcp-comment-icon-color: #ccc;
         @include flex(0 0 auto);
         white-space: nowrap;
         font-size: 1.2rem;
+
+        .attachment-icon {
+            top: 0.2rem;
+            margin-right: 0.75rem;
+        }
     }
 
     .pillar-col,
@@ -506,16 +557,17 @@ $pcp-comment-icon-color: #ccc;
     }
     
     .id-col {
-        width: 6rem;
+        width: 7rem;
+        text-indent: 1rem
     }
 
     .location-col {
         width: 20rem;
         overflow: hidden;
         text-overflow: ellipsis;
+        white-space: nowrap;
     }
 }
-
 
 @media (min-width: 640px) {
     .pcp-comment-table {
@@ -527,7 +579,7 @@ $pcp-comment-icon-color: #ccc;
             }
 
             .date-col {
-                width: 18rem;
+                width: 20rem;
             }
         }
 
@@ -545,7 +597,7 @@ $pcp-comment-icon-color: #ccc;
         }
 
         .date-col {
-            width: 18rem;
+            width: 20rem;
         }
 
         td.date-col {
@@ -596,8 +648,6 @@ $pcp-comment-icon-color: #ccc;
 
 // Related Documents Tab
 .pcp-related-docs {
-    padding-top: 1.5rem;
-
     h2 {
         margin-bottom: 2rem;
         font-size: 2rem;
