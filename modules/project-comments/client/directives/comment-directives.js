@@ -502,8 +502,25 @@ angular.module ('comment')
 						s.next    = function () { s.step++; };
 						s.ok      = function () { $modalInstance.close (s.comment); };
 						s.submit  = function () {
-							return submitAddComment(s, comment, $scope);
+							comment.inProgress = false;
+							comment.isAnonymous = !comment.makeVisible;
+							comment.comment =  comment.comment || "Please see attached"; //if the comment is empty and has attachment
+							comment.isAnonymous = !comment.author // if the author is empty make it anonymous
+							return addFiles(comment, s.fileList, s.fileList2, addTheComment);
 						};
+						function addTheComment(comment) {
+							return CommentModel.add (comment)
+							.then (function (comment) {
+								s.step = 3;
+								$scope.$apply ();
+								return null;
+							})
+							.catch (function (err) {
+								console.log("goto to step 4", err);
+								s.step = 4;
+								$scope.$apply ();
+							});
+						}
 					}
 				})
 				.result.then (function (data) {
@@ -515,130 +532,40 @@ angular.module ('comment')
 				.catch (function (err) {});
 			});
 
-			function submitAddComment(s, comment, $scope) {
-				function addTheComment(s) {
-					return CommentModel.add (s.comment)
-					.then (function (comment) {
-						s.step = 3;
-						$scope.$apply ();
-						return null;
-					})
-					.catch (function (err) {
-						console.log("goto to step 4", err);
-						s.step = 4;
-						$scope.$apply ();
+			function addFiles(comment, fileList, fileList2, addTheComment) {
+				var url = '/api/commentdocument/' + comment.project._id + '/upload';
+				var combined = [];
+				_.forEach(fileList, function(file){
+					combined.push({
+						url: url,
+						file: file,
+						target: comment.documents
 					});
-				}
-				s.comment.inProgress = false;
-				comment.isAnonymous = !comment.makeVisible;
-				comment.comment =  comment.comment || "Please see attached"; //if the comment is empty and has attachment
-				comment.isAnonymous = !comment.author // if the author is empty make it anonymous
+				});
+				_.forEach(fileList2, function(file){
+					combined.push({
+						url: url,
+						file: file,
+						target: comment.documents2
+					});
+				});
+				var docCount = combined.length;
 
-				var docCount = s.fileList.length;
-				if (docCount === 0 ) {
-					addTheComment(s);
+				if ((docCount) === 0 ) {
+					addTheComment(comment);
 				} else {
-					var uploadedDocs = [];
-					// Upload docs
-					angular.forEach( s.fileList, function(file) {
-						// Quick hack to pass objects
-						file.upload = Upload.upload({
-							url: '/api/commentdocument/' + comment.project._id + '/upload',
-							file: file
-						});
-						file.upload.then(function (response) {
-							$timeout(function () {
-								file.result = response.data;
-								uploadedDocs.push(response.data._id);
-								// when the last file is finished, send complete event.
+					_.forEach( combined, function(opts) {
+						Upload.upload(opts)
+						.then(function (response) {
+							opts.file.result = response.data;
+							opts.target.push(response.data._id);
 								if (--docCount === 0) {
-									_.each( uploadedDocs, function(d) {
-										s.comment.documents.push(d);
-									});
-
-									addTheComment(s);
+									addTheComment(comment);
 								}
-							});
 						}, function (response) {
-							if (response.status > 0) {
-								// docUpload.errorMsg = response.status + ': ' + response.data;
-								console.log("error data:",response.data);
-							} else {
-								_.remove($scope.s.comment.files, file);
-							}
+							console.log("error status:",response.status, response.data);
 						}, function (evt) {
-							file.progress = Math.min(100, parseInt(100.0 * evt.loaded / evt.total));
-						});
-					});
-				}
-			}
-
-			function submitAddCommentOld(s, comment, $scope) {
-				// console.log("files:", s.fileList);
-				s.comment.inProgress = false;
-				comment.isAnonymous = !comment.makeVisible;
-				var docCount = s.fileList.length;
-				if (!comment.author) {
-					comment.isAnonymous = true; // if the author is empty make it anonymous
-				}
-				if (docCount === 0 ) {
-					// We don't need to do anything but add the comment.
-					// console.log("s.comment:", s.comment);
-					CommentModel.add (s.comment)
-					.then (function (comment) {
-						s.step = 3;
-						$scope.$apply ();
-						return null;
-					})
-					.catch (function (err) {
-						console.log("goto to step 4", err);
-						s.step = 4;
-						$scope.$apply ();
-					});
-				} else {
-					var uploadedDocs = [];
-					// Upload docs
-					angular.forEach( s.fileList, function(file) {
-						// Quick hack to pass objects
-						file.upload = Upload.upload({
-							url: '/api/commentdocument/' + comment.project._id + '/upload',
-							file: file
-						});
-						file.upload.then(function (response) {
-							$timeout(function () {
-								file.result = response.data;
-								uploadedDocs.push(response.data._id);
-								// when the last file is finished, send complete event.
-								if (--docCount === 0) {
-									_.each( uploadedDocs, function(d) {
-										s.comment.documents.push(d);
-									});
-
-									if (!s.comment.comment) {
-										s.comment.comment = "Please see the Attachment"; //if the comment is empty and has attachment
-									}
-
-									CommentModel.add (s.comment)
-									.then (function (comment) {
-										s.step = 3;
-										$scope.$apply ();
-									})
-									.catch (function (err) {
-										console.log("goto to step 4", err);
-										s.step = 4;
-										$scope.$apply ();
-									});
-								}
-							});
-						}, function (response) {
-							if (response.status > 0) {
-								// docUpload.errorMsg = response.status + ': ' + response.data;
-								console.log("error data:",response.data);
-							} else {
-								_.remove($scope.s.comment.files, file);
-							}
-						}, function (evt) {
-							file.progress = Math.min(100, parseInt(100.0 * evt.loaded / evt.total));
+							opts.file.progress = Math.min(100, parseInt(100.0 * evt.loaded / evt.total));
 						});
 					});
 				}
