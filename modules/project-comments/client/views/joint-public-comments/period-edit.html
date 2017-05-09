@@ -52,7 +52,7 @@
                             x-published-only="'true'"
                             x-on-ok="addFilesToPackage1"><span class="glyphicon glyphicon-link"></span><span>Link Documents</span></button>
                 </div>
-                <tmpl-period-documents-list x-file-list="period.relatedDocuments"></tmpl-period-documents-list>
+                <tmpl-period-documents-list x-can-modify="true" x-file-list="period.relatedDocuments"></tmpl-period-documents-list>
             </div>
             <div class="form-group">
                 <label class="control-label">Additional Information<em>(Optional)</em></label>
@@ -78,7 +78,7 @@
                             x-published-only="'true'"
                             x-on-ok="addFilesToPackage2"><span class="glyphicon glyphicon-link"></span><span>Link Documents</span></button>
                 </div>
-                <tmpl-period-documents-list x-file-list="period.relatedDocumentsPackage2"></tmpl-period-documents-list>
+                <tmpl-period-documents-list x-can-modify="true" x-file-list="period.relatedDocumentsPackage2"></tmpl-period-documents-list>
             </div>
             <div class="form-group">
                 <label class="control-label">Additional Information<em>(Optional)</em></label>

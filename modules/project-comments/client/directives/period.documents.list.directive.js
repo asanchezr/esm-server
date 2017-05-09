@@ -10,14 +10,17 @@ angular.module ('comment')
 		restrict: 'E',
 		scope: {
 			fileList : '=',
+			canModify : "=",
 			sorting  : '=?'  // optional
 		},
 		templateUrl : 'modules/project-comments/client/views/partials/period-documents-list.html',
 		controllerAs: 'ctrl',
-		controller: function ($scope, $element, $attrs, _) {
+		controller: function ($scope, $element, $attrs, _, Authentication) {
 			var ctrl       = this;
 			ctrl.fileList = $scope.fileList;
+			ctrl.canModify = $scope.canModify;
 
+			ctrl.authentication = Authentication;
 			// default sort is by name ascending...
 			var defaultSorting = {
 				column: 'name',

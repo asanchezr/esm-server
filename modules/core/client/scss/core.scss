@@ -3278,12 +3278,6 @@ section {
 	}
 }
 
-.pcp-comment-count-label {
-	display: inline-block;
-	margin-top: 0.8rem;
-	font-weight: bold;
-}
-
 .pcp-pillar-vc-list {
 	.vc-details {
 		-webkit-flex: 1 1 auto;
@@ -4245,6 +4239,7 @@ tmpl-template-render {
 
 // GLOBAL
 @import "modules/core/client/scss/global/footer.scss";
+@import "modules/core/client/scss/global/helpers.scss";
 @import "modules/documents/client/styles/file-browser.scss";
 @import "modules/documents/client/styles/pdf-viewer.scss";
 

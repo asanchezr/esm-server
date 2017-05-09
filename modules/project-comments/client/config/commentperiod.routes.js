@@ -254,60 +254,6 @@ angular.module('comment').config(['$stateProvider', 'moment', "_", function ($st
 			// all others with add comment permission must wait until the period is open
 			$scope.allowCommentSubmit = (isopen && period.userCan.addComment) || period.userCan.vetComments;
 
-			$scope.documentMgr = {
-				sortedFiles: $scope.period.relatedDocuments,
-				sorting: {
-					column: 'name',
-					ascending: true
-				},
-				sortBy: function (column) {
-					//is this the current column?
-					if ($scope.documentMgr.sorting.column.toLowerCase() === column.toLowerCase()) {
-						//so we reverse the order...
-						$scope.documentMgr.sorting.ascending = !$scope.documentMgr.sorting.ascending;
-					} else {
-						// changing column, set to ascending...
-						$scope.documentMgr.sorting.column = column.toLowerCase();
-						$scope.documentMgr.sorting.ascending = true;
-					}
-					$scope.documentMgr.applySort();
-				},
-				applySort: function () {
-					// sort ascending first...
-					$scope.documentMgr.sortedFiles = _.sortBy($scope.period.relatedDocuments, function (f) {
-						// more making sure that the displayName is set...
-						if (_.isEmpty(f.displayName)) {
-							f.displayName = f.documentFileName || f.internalOriginalName;
-						}
-
-						if ($scope.documentMgr.sorting.column === 'name') {
-							return _.isEmpty(f.displayName) ? null : f.displayName.toLowerCase();
-						} else if ($scope.documentMgr.sorting.column === 'author') {
-							return _.isEmpty(f.documentAuthor) ? null : f.documentAuthor.toLowerCase();
-						} else if ($scope.documentMgr.sorting.column === 'type') {
-							return _.isEmpty(f.internalExt) ? null : f.internalExt.toLowerCase();
-						} else if ($scope.documentMgr.sorting.column === 'size') {
-							return _.isEmpty(f.internalExt) ? 0 : f.internalSize;
-						} else if ($scope.documentMgr.sorting.column === 'date') {
-							//date uploaded
-							return _.isEmpty(f.dateUploaded) ? 0 : f.dateUploaded;
-						} else if ($scope.documentMgr.sorting.column === 'pub') {
-							//is published...
-							return !f.isPublished;
-						}
-						// by name if none specified... or we incorrectly identified...
-						return _.isEmpty(f.displayName) ? null : f.displayName.toLowerCase();
-					});
-
-					if (!$scope.documentMgr.sorting.ascending) {
-						// and if we are not supposed to be ascending... then reverse it!
-						$scope.documentMgr.sortedFiles = _($scope.documentMgr.sortedFiles).reverse().value();
-					}
-
-				}
-			};
-
-			$scope.documentMgr.applySort();
 		}
 	})
 
@@ -713,8 +659,8 @@ angular.module('comment').config(['$stateProvider', 'moment', "_", function ($st
 			$scope.hasErrors = false;
 
 			// Placeholder text for Package 1 (i.e. Provincial) of Joint PCPs
-			period.informationLabel = 'Blah Blah';
-			period.informationLabelPackage2 = 'Yada Yada';
+			period.informationLabel = 'Draft Assessment Report & Draft Conditions';
+			period.informationLabelPackage2 = ' ';
 			period.commenterRoles = ['public'];
 
 			commonSetup($timeout, $scope, period, project, CodeLists, CommentPeriodModel);
@@ -988,7 +934,7 @@ angular.module('comment').config(['$stateProvider', 'moment', "_", function ($st
 		}
 
 		function instructions(project, period, CommentPeriodModel) {
-			var template = "Comment Period on the %INFORMATION_LABEL_PACKAGE_1% and the %INFORMATION_LABEL_PACKAGE_2% for the %PROJECT_NAME% Project.";
+			var template = "This Public Comment Period is regarding the %INFORMATION_LABEL_PACKAGE_1% and the %INFORMATION_LABEL_PACKAGE_2%.";
 
 			var PROJECT_NAME = project.name || '%PROJECT_NAME%';
 			var INFORMATION_LABEL_PACKAGE_1 = period.informationLabel || '%INFORMATION_LABEL_PACKAGE_1%';

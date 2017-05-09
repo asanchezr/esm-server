@@ -14,7 +14,7 @@
                     <span>Size</span>
                     <span class="sort-icon" ng-show="ctrl.sorting.column === 'size'"></span>
                 </div>
-                <div class="col size-col sortable last-col" ng-class="{'descending': !ctrl.sorting.ascending}" ng-click="ctrl.sortBy('pub')">
+                <div class="col size-col sortable last-col" ng-if="ctrl.authentication.user" ng-class="{'descending': !ctrl.sorting.ascending}" ng-click="ctrl.sortBy('pub')">
                     <span>Status</span>
                     <span class="sort-icon" ng-show="ctrl.sorting.column === 'pub'"></span>
                 </div>
@@ -37,7 +37,7 @@
                     </span>
                     <span class="col type-col">{{ doc.internalExt}}</span>
                     <span class="col size-col">{{ doc.internalSize | bytes:2 }}</span>
-                    <span class="col status-col"><span ng-if="doc.isPublished" title="Published"><span class="glyphicon glyphicon-ok-circle"></span></span></span>
+                    <span class="col status-col" ng-if="ctrl.authentication.user" ><span ng-if="doc.isPublished" title="Published"><span class="glyphicon glyphicon-ok-circle"></span></span></span>
                     <span class="row-actions visible">
                         <div class="btn-group">
                             <button class="btn icon-btn dropdown-toggle" type="button" ng-click="$event.originalEvent.dropdown = true" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -48,7 +48,7 @@
                                     <a class="btn icon-btn" href="/api/document/{{ doc._id }}/fetch" target="_self" title="Download File" ng-if="doc.userCan.read">
                                         <span class="glyphicon glyphicon-download-alt"></span></a>
                                 </li>
-                                <li>
+                                <li ng-if="ctrl.canModify">
                                     <button class="btn icon-btn"
                                             ng-click="ctrl.removeDocument(doc)">
                                         <span class="glyphicon glyphicon-trash"></span>
