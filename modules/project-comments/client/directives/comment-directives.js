@@ -19,7 +19,7 @@ angular.module ('comment')
 		restrict: 'E',
 		templateUrl : 'modules/project-comments/client/views/public-comments/list.html',
 		controllerAs: 's',
-		controller: function ($rootScope, $scope, $filter, NgTableParams, Authentication, CommentModel, UserModel, CommentPeriodModel, _) {
+		controller: function ($scope, $filter, NgTableParams, Authentication, CommentModel, UserModel, CommentPeriodModel, _) {
 			var s       = this;
 			var project = s.project = $scope.project;
 			var period  = s.period  = $scope.period;
@@ -83,15 +83,6 @@ angular.module ('comment')
 			};
 
 			$scope.authentication = Authentication;
-
-			$scope.$on('NEW_PUBLIC_COMMENT_ADDED', function (e, data) {
-				console.log('comment: ' + data.comment);
-
-				// We shouldn't do this if we're public.
-				if (period.userCan.vetComments) {
-					//selectPage(currentPage);
-				}
-			});
 
 			// -------------------------------------------------------------------------
 			//
@@ -401,6 +392,36 @@ angular.module ('comment')
 		}
 	};
 })
+/*
+ Support for displaying a list of files to be uploaded and wrap the upload process
+ */
+.directive('fileUploadListing', ['_', 'DocumentsUploadService', function (_, DocumentsUploadService) {
+	return {
+		restrict: 'E',
+		scope: {
+			fileList: '='
+		},
+		templateUrl: 'modules/documents/client/views/partials/file-upload-listing.html',
+		controllerAs: 'vm',
+		controller: function ($scope) {
+			var self = this;
+			self.fileList = $scope.fileList || [];
+
+			self.removeFile = removeFile;
+
+			// uncomment the following to push in some sample data
+			// var mb = 8888888;
+			// self.fileList.push({uploaded: false, failed: false, cancelled: false, size:mb, name: 'f1', progress: 0});
+			// self.fileList.push({uploaded: false, failed: false, cancelled: false, size:mb,  name: 'f2', progress: 60});
+			// self.fileList.push({uploaded: false, failed: true, cancelled: false, size:mb,  name: 'f3', progress: 80});
+			// self.fileList.push({uploaded: true, failed: false, cancelled: false, size:mb,  name: 'f4', progress: 1000});
+
+			function removeFile(f) {
+				_.remove(self.fileList, f);
+			};
+		}
+	};
+}])
 // -------------------------------------------------------------------------
 //
 // add a public comment
@@ -427,7 +448,7 @@ angular.module ('comment')
 							return CommentModel.getNew ();
 						}
 					},
-					controller: function ($rootScope, $scope, $modalInstance, comment) {
+					controller: function ($scope, $modalInstance, comment) {
 						// console.log("Adding a comment.");
 						var s     = this;
 
@@ -440,8 +461,10 @@ angular.module ('comment')
 						comment.period = scope.period;
 						comment.project = scope.project;
 						comment.files = scope.files;
+						comment.files2 = scope.files2;
 						comment.makeVisible = false;
 						s.fileList = [];
+						s.fileList2 = [];
 						s.showAlert = false;
 
 						$scope.$watch('s.comment.files', function (newValue) {
@@ -457,87 +480,29 @@ angular.module ('comment')
 								});
 							}
 						});
-						s.comment.removeFile = function(f) {
-							_.remove(s.fileList, f);
-						};
+						$scope.$watch('s.comment.files2', function (newValue) {
+							if (newValue) {
+								s.showAlert = false;
+								s.comment.inProgress = false;
+								_.each( newValue, function(file, idx) {
+									if (file.size > maxFileSize) {
+										s.showAlert = true;
+									} else {
+										s.fileList2.push(file);
+									}
+								});
+							}
+						});
+						// s.comment.removeFile = function(f) {
+						// 	_.remove(s.fileList, f);
+						// };
 
 						s.closeAlert = function(){ s.showAlert = false; };
-
 						s.cancel  = function () { $modalInstance.dismiss ('cancel'); };
 						s.next    = function () { s.step++; };
 						s.ok      = function () { $modalInstance.close (s.comment); };
 						s.submit  = function () {
-							// console.log("files:", s.fileList);
-							s.comment.inProgress = false;
-							comment.isAnonymous = !comment.makeVisible;
-							var docCount = s.fileList.length;
-
-							if (!comment.author) {
-								comment.isAnonymous = true; // if the author is empty make it anonymous
-							}
-
-							if (docCount === 0 ) {
-								// We don't need to do anything but add the comment.
-								// console.log("s.comment:", s.comment);
-								 CommentModel.add (s.comment)
-								.then (function (comment) {
-									s.step = 3;
-									$scope.$apply ();
-									$rootScope.$broadcast('NEW_PUBLIC_COMMENT_ADDED', {comment: comment});
-									return null;
-								})
-								.catch (function (err) {
-									s.step = 4;
-									$scope.$apply ();
-								});
-							} else {
-								var uploadedDocs = [];
-								// Upload docs
-								angular.forEach( s.fileList, function(file) {
-									// Quick hack to pass objects
-									file.upload = Upload.upload({
-										url: '/api/commentdocument/' + comment.project._id + '/upload',
-										file: file
-									});
-
-									file.upload.then(function (response) {
-										$timeout(function () {
-											file.result = response.data;
-											uploadedDocs.push(response.data._id);
-											// when the last file is finished, send complete event.
-											if (--docCount === 0) {
-												_.each( uploadedDocs, function(d) {
-													s.comment.documents.push(d);
-												});
-		
-												if (!s.comment.comment) {
-													s.comment.comment = "Please see the Attachment"; //if the comment is empty and has attachment
-												} 
-												
-												CommentModel.add (s.comment)
-												.then (function (comment) {
-													s.step = 3;
-													$scope.$apply ();
-													$rootScope.$broadcast('NEW_PUBLIC_COMMENT_ADDED', {comment: comment});
-												})
-												.catch (function (err) {
-													s.step = 4;
-													$scope.$apply ();
-												});
-											}
-										});
-									}, function (response) {
-										if (response.status > 0) {
-											// docUpload.errorMsg = response.status + ': ' + response.data;
-											console.log("error data:",response.data);
-										} else {
-											_.remove($scope.s.comment.files, file);
-										}
-									}, function (evt) {
-										file.progress = Math.min(100, parseInt(100.0 * evt.loaded / evt.total));
-									});
-								});
-							}
+							return submitAddComment(s, comment, $scope);
 						};
 					}
 				})
@@ -549,6 +514,135 @@ angular.module ('comment')
 				})
 				.catch (function (err) {});
 			});
+
+			function submitAddComment(s, comment, $scope) {
+				function addTheComment(s) {
+					return CommentModel.add (s.comment)
+					.then (function (comment) {
+						s.step = 3;
+						$scope.$apply ();
+						return null;
+					})
+					.catch (function (err) {
+						console.log("goto to step 4", err);
+						s.step = 4;
+						$scope.$apply ();
+					});
+				}
+				s.comment.inProgress = false;
+				comment.isAnonymous = !comment.makeVisible;
+				comment.comment =  comment.comment || "Please see attached"; //if the comment is empty and has attachment
+				comment.isAnonymous = !comment.author // if the author is empty make it anonymous
+
+				var docCount = s.fileList.length;
+				if (docCount === 0 ) {
+					addTheComment(s);
+				} else {
+					var uploadedDocs = [];
+					// Upload docs
+					angular.forEach( s.fileList, function(file) {
+						// Quick hack to pass objects
+						file.upload = Upload.upload({
+							url: '/api/commentdocument/' + comment.project._id + '/upload',
+							file: file
+						});
+						file.upload.then(function (response) {
+							$timeout(function () {
+								file.result = response.data;
+								uploadedDocs.push(response.data._id);
+								// when the last file is finished, send complete event.
+								if (--docCount === 0) {
+									_.each( uploadedDocs, function(d) {
+										s.comment.documents.push(d);
+									});
+
+									addTheComment(s);
+								}
+							});
+						}, function (response) {
+							if (response.status > 0) {
+								// docUpload.errorMsg = response.status + ': ' + response.data;
+								console.log("error data:",response.data);
+							} else {
+								_.remove($scope.s.comment.files, file);
+							}
+						}, function (evt) {
+							file.progress = Math.min(100, parseInt(100.0 * evt.loaded / evt.total));
+						});
+					});
+				}
+			}
+
+			function submitAddCommentOld(s, comment, $scope) {
+				// console.log("files:", s.fileList);
+				s.comment.inProgress = false;
+				comment.isAnonymous = !comment.makeVisible;
+				var docCount = s.fileList.length;
+				if (!comment.author) {
+					comment.isAnonymous = true; // if the author is empty make it anonymous
+				}
+				if (docCount === 0 ) {
+					// We don't need to do anything but add the comment.
+					// console.log("s.comment:", s.comment);
+					CommentModel.add (s.comment)
+					.then (function (comment) {
+						s.step = 3;
+						$scope.$apply ();
+						return null;
+					})
+					.catch (function (err) {
+						console.log("goto to step 4", err);
+						s.step = 4;
+						$scope.$apply ();
+					});
+				} else {
+					var uploadedDocs = [];
+					// Upload docs
+					angular.forEach( s.fileList, function(file) {
+						// Quick hack to pass objects
+						file.upload = Upload.upload({
+							url: '/api/commentdocument/' + comment.project._id + '/upload',
+							file: file
+						});
+						file.upload.then(function (response) {
+							$timeout(function () {
+								file.result = response.data;
+								uploadedDocs.push(response.data._id);
+								// when the last file is finished, send complete event.
+								if (--docCount === 0) {
+									_.each( uploadedDocs, function(d) {
+										s.comment.documents.push(d);
+									});
+
+									if (!s.comment.comment) {
+										s.comment.comment = "Please see the Attachment"; //if the comment is empty and has attachment
+									}
+
+									CommentModel.add (s.comment)
+									.then (function (comment) {
+										s.step = 3;
+										$scope.$apply ();
+									})
+									.catch (function (err) {
+										console.log("goto to step 4", err);
+										s.step = 4;
+										$scope.$apply ();
+									});
+								}
+							});
+						}, function (response) {
+							if (response.status > 0) {
+								// docUpload.errorMsg = response.status + ': ' + response.data;
+								console.log("error data:",response.data);
+							} else {
+								_.remove($scope.s.comment.files, file);
+							}
+						}, function (evt) {
+							file.progress = Math.min(100, parseInt(100.0 * evt.loaded / evt.total));
+						});
+					});
+				}
+			}
 		}
 	};
 })
@@ -656,48 +750,3 @@ angular.module ('comment')
 	}
 ])
 ;
-//
-// CC: pretty sure these are not used anymore
-//
-// // -------------------------------------------------------------------------
-// //
-// // Comment Period List for a given project
-// //
-// // -------------------------------------------------------------------------
-// .directive ('tmplCommentPeriodList', function () {
-// 	return {
-// 		restrict: 'E',
-// 		templateUrl: 'modules/project-comments/client/views/period-list.html',
-// 		controller: 'controllerCommentPeriodList',
-// 		controllerAs: 'plist'
-// 	};
-// })
-// .directive ('editPeriodModal', ['$modal', function ($modal) {
-// 	return {
-// 		restrict: 'A',
-// 		scope: {
-// 			project: '=',
-// 			period: '='
-// 		},
-// 		link : function (scope, element, attrs) {
-// 			// console.log('my modal is running');
-// 			element.on ('click', function () {
-// 				var modalView = $modal.open ({
-// 					animation: true,
-// 					templateUrl: 'modules/project-comments/client/views/period-edit.html',
-// 					controller: 'controllerEditPeriodModal',
-// 					controllerAs: 'p',
-// 					scope: scope,
-// 					size: 'lg',
-// 					resolve: {
-// 						rProject: function() { return scope.project; },
-// 						rPeriod: function() { return scope.period; }
-// 					}
-// 				});
-// 				modalView.result.then(function () {}, function () {});
-// 			});
-// 		}
-
-// 	};
-// }]
-
