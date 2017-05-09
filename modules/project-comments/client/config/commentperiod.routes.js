@@ -659,7 +659,7 @@ angular.module('comment').config(['$stateProvider', 'moment', "_", function ($st
 			$scope.hasErrors = false;
 
 			// Placeholder text for Package 1 (i.e. Provincial) of Joint PCPs
-			period.informationLabel = 'Draft Assessment Report';
+			period.informationLabel = 'Draft Assessment Report & Draft Conditions';
 			period.informationLabelPackage2 = ' ';
 			period.commenterRoles = ['public'];
 

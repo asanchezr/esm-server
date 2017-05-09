@@ -157,11 +157,11 @@
 								<td class="p-t-0">
 									<div ng-if="o.comment">
 										<h4>Comment on the {{period.informationLabel}}</h4>
-										<span>{{ ::o.comment }}</span>
+										<span>{{ ::o.comment | maxWords: 50 }}</span>
 									</div>
 									<div ng-if="o.comment2">
 										<h4>Comment on the {{period.informationLabelPackage2}}</h4>
-										<span class="comment">{{ ::o.comment2 }}</span>
+										<span class="comment">{{ ::o.comment2 | maxWords: 50 }}</span>
 									</div>
 								</td>
 							</tr>
@@ -204,7 +204,7 @@
 								<td class="id-col p-t-0" ng-if="authentication.user"></td>
 								<td class="p-t-0">
 									<div ng-if="o.comment" ng-init="toggleProject.desc = (false)">
-										<span>{{ ::o.comment }}</span>
+										<span>{{ ::o.comment | maxWords: 50 }}</span>
 									</div>
 								</td>
 							</tr>
