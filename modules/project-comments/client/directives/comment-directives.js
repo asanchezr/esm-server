@@ -415,139 +415,15 @@ angular.module ('comment')
 		},
 		link : function(scope, element, attrs) {
 			element.on('click', function () {
-				$modal.open ({
-					animation: true,
-					templateUrl: 'modules/project-comments/client/views/public-comments/add.html',
-					controllerAs: 's',
-					backdrop: 'static',
-					size: 'lg',
-					windowClass: 'public-comment-modal',
-					resolve: {
-						comment: function (CommentModel) {
-							return CommentModel.getNew ();
-						}
-					},
-					controller: function ($rootScope, $scope, $modalInstance, comment) {
-						// console.log("Adding a comment.");
-						var s     = this;
-
-						$scope.project = scope.project;
-
-						var maxFileSize = 5 * 1024 * 1024; //5MB
-
-						s.step    = 1;
-						s.comment = comment;
-						comment.period = scope.period;
-						comment.project = scope.project;
-						comment.files = scope.files;
-						comment.makeVisible = false;
-						s.fileList = [];
-						s.showAlert = false;
-
-						$scope.$watch('s.comment.files', function (newValue) {
-							if (newValue) {
-								s.showAlert = false;
-								s.comment.inProgress = false;
-								_.each( newValue, function(file, idx) {
-									if (file.size > maxFileSize) {
-										s.showAlert = true;
-									} else {
-										s.fileList.push(file);
-									}
-								});
-							}
-						});
-						s.comment.removeFile = function(f) {
-							_.remove(s.fileList, f);
-						};
-
-						s.closeAlert = function(){ s.showAlert = false; };
-
-						s.cancel  = function () { $modalInstance.dismiss ('cancel'); };
-						s.next    = function () { s.step++; };
-						s.ok      = function () { $modalInstance.close (s.comment); };
-						s.submit  = function () {
-							// console.log("files:", s.fileList);
-							s.comment.inProgress = false;
-							comment.isAnonymous = !comment.makeVisible;
-							var docCount = s.fileList.length;
-
-							if (!comment.author) {
-								comment.isAnonymous = true; // if the author is empty make it anonymous
-							}
-
-							if (docCount === 0 ) {
-								// We don't need to do anything but add the comment.
-								// console.log("s.comment:", s.comment);
-								 CommentModel.add (s.comment)
-								.then (function (comment) {
-									s.step = 3;
-									$scope.$apply ();
-									$rootScope.$broadcast('NEW_PUBLIC_COMMENT_ADDED', {comment: comment});
-									return null;
-								})
-								.catch (function (err) {
-									s.step = 4;
-									$scope.$apply ();
-								});
-							} else {
-								var uploadedDocs = [];
-								// Upload docs
-								angular.forEach( s.fileList, function(file) {
-									// Quick hack to pass objects
-									file.upload = Upload.upload({
-										url: '/api/commentdocument/' + comment.project._id + '/upload',
-										file: file
-									});
-
-									file.upload.then(function (response) {
-										$timeout(function () {
-											file.result = response.data;
-											uploadedDocs.push(response.data._id);
-											// when the last file is finished, send complete event.
-											if (--docCount === 0) {
-												_.each( uploadedDocs, function(d) {
-													s.comment.documents.push(d);
-												});
-		
-												if (!s.comment.comment) {
-													s.comment.comment = "Please see the Attachment"; //if the comment is empty and has attachment
-												} 
-												
-												CommentModel.add (s.comment)
-												.then (function (comment) {
-													s.step = 3;
-													$scope.$apply ();
-													$rootScope.$broadcast('NEW_PUBLIC_COMMENT_ADDED', {comment: comment});
-												})
-												.catch (function (err) {
-													s.step = 4;
-													$scope.$apply ();
-												});
-											}
-										});
-									}, function (response) {
-										if (response.status > 0) {
-											// docUpload.errorMsg = response.status + ': ' + response.data;
-											console.log("error data:",response.data);
-										} else {
-											_.remove($scope.s.comment.files, file);
-										}
-									}, function (evt) {
-										file.progress = Math.min(100, parseInt(100.0 * evt.loaded / evt.total));
-									});
-								});
-							}
-						};
-					}
-				})
-				.result.then (function (data) {
-					// Redirect to full PCP page
-					$state.transitionTo('p.commentperiod.detail', {projectid: scope.project.code, periodId: data.period._id}, {
-						reload: true, inherit: false, notify: true
-					});
-				})
-				.catch (function (err) {});
+				// Either regular PCP or joint PCP
+				var modal;
+				if (scope.period.periodType === 'Joint') {
+					modal = new JointCommentPeriodModal($modal, CommentModel, Upload, $timeout, _, $state, scope, element, attrs);
+					modal.show();
+				} else if (scope.period.periodType === 'Public') {
+					modal = new PublicCommentPeriodModal($modal, CommentModel, Upload, $timeout, _, $state, scope, element, attrs);
+					modal.show();
+				}
 			});
 		}
 	};
@@ -656,6 +532,299 @@ angular.module ('comment')
 	}
 ])
 ;
+
+function PublicCommentPeriodModal($modal, CommentModel, Upload, $timeout, _, $state, scope, element, attrs) {
+	this.show = function() {
+		$modal.open ({
+			animation: true,
+			templateUrl: 'modules/project-comments/client/views/public-comments/add.html',
+			controllerAs: 's',
+			backdrop: 'static',
+			size: 'lg',
+			windowClass: 'public-comment-modal',
+			resolve: {
+				comment: function (CommentModel) {
+					return CommentModel.getNew ();
+				}
+			},
+			controller: function ($rootScope, $scope, $modalInstance, comment) {
+				// console.log("Adding a comment.");
+				var s     = this;
+
+				$scope.project = scope.project;
+
+				var maxFileSize = 5 * 1024 * 1024; //5MB
+
+				s.step    = 1;
+				s.comment = comment;
+				comment.period = scope.period;
+				comment.project = scope.project;
+				comment.files = scope.files;
+				comment.makeVisible = false;
+				s.fileList = [];
+				s.showAlert = false;
+
+				$scope.$watch('s.comment.files', function (newValue) {
+					if (newValue) {
+						s.showAlert = false;
+						s.comment.inProgress = false;
+						_.each( newValue, function(file, idx) {
+							if (file.size > maxFileSize) {
+								s.showAlert = true;
+							} else {
+								s.fileList.push(file);
+							}
+						});
+					}
+				});
+				s.comment.removeFile = function(f) {
+					_.remove(s.fileList, f);
+				};
+
+				s.closeAlert = function(){ s.showAlert = false; };
+
+				s.cancel  = function () { $modalInstance.dismiss ('cancel'); };
+				s.next    = function () { s.step++; };
+				s.ok      = function () { $modalInstance.close (s.comment); };
+				s.submit  = function () {
+					// console.log("files:", s.fileList);
+					s.comment.inProgress = false;
+					comment.isAnonymous = !comment.makeVisible;
+					var docCount = s.fileList.length;
+
+					if (!comment.author) {
+						comment.isAnonymous = true; // if the author is empty make it anonymous
+					}
+
+					if (docCount === 0 ) {
+						// We don't need to do anything but add the comment.
+						// console.log("s.comment:", s.comment);
+							CommentModel.add (s.comment)
+						.then (function (comment) {
+							s.step = 3;
+							$scope.$apply ();
+							$rootScope.$broadcast('NEW_PUBLIC_COMMENT_ADDED', {comment: comment});
+							return null;
+						})
+						.catch (function (err) {
+							s.step = 4;
+							$scope.$apply ();
+						});
+					} else {
+						var uploadedDocs = [];
+						// Upload docs
+						angular.forEach( s.fileList, function(file) {
+							// Quick hack to pass objects
+							file.upload = Upload.upload({
+								url: '/api/commentdocument/' + comment.project._id + '/upload',
+								file: file
+							});
+
+							file.upload.then(function (response) {
+								$timeout(function () {
+									file.result = response.data;
+									uploadedDocs.push(response.data._id);
+									// when the last file is finished, send complete event.
+									if (--docCount === 0) {
+										_.each( uploadedDocs, function(d) {
+											s.comment.documents.push(d);
+										});
+
+										if (!s.comment.comment) {
+											s.comment.comment = "Please see the Attachment"; //if the comment is empty and has attachment
+										}
+
+										CommentModel.add (s.comment)
+										.then (function (comment) {
+											s.step = 3;
+											$scope.$apply ();
+											$rootScope.$broadcast('NEW_PUBLIC_COMMENT_ADDED', {comment: comment});
+										})
+										.catch (function (err) {
+											s.step = 4;
+											$scope.$apply ();
+										});
+									}
+								});
+							}, function (response) {
+								if (response.status > 0) {
+									// docUpload.errorMsg = response.status + ': ' + response.data;
+									console.log("error data:",response.data);
+								} else {
+									_.remove($scope.s.comment.files, file);
+								}
+							}, function (evt) {
+								file.progress = Math.min(100, parseInt(100.0 * evt.loaded / evt.total));
+							});
+						});
+					}
+				};
+			}
+		})
+		.result.then (function (data) {
+			// Redirect to full PCP page
+			$state.transitionTo('p.commentperiod.detail', {projectid: scope.project.code, periodId: data.period._id}, {
+				reload: true, inherit: false, notify: true
+			});
+		})
+		.catch (function (err) {});
+	};
+}
+
+function JointCommentPeriodModal($modal, CommentModel, Upload, $timeout, _, $state, scope, element, attrs) {
+	this.show = function() {
+		$modal.open ({
+			animation: true,
+			templateUrl: 'modules/project-comments/client/views/joint-public-comments/submit-comment.html',
+			controllerAs: 'ctrl',
+			backdrop: 'static',
+			size: 'lg',
+			windowClass: 'public-comment-modal',
+			resolve: {
+				comment: function (CommentModel) {
+					return CommentModel.getNew ();
+				}
+			},
+			controller: function ($rootScope, $scope, $modalInstance, comment) {
+
+				var ctrl = this;
+
+				// private
+				function setupUIState() {
+					// Make sure all files submitted are under 5MB
+					$scope.$watch('ctrl.package1.files', function (newValue) {
+						if (newValue) {
+							ctrl.closeAlert();
+							_.each(newValue, function(file, idx) {
+								if (file.size > ctrl.maxFileSize) {
+									ctrl.openAlert();
+								} else {
+									ctrl.package1.validFiles.push(file);
+								}
+							});
+						}
+					});
+					$scope.$watch('ctrl.package2.files', function (newValue) {
+						if (newValue) {
+							ctrl.closeAlert();
+							_.each(newValue, function(file, idx) {
+								if (file.size > ctrl.maxFileSize) {
+									ctrl.openAlert();
+								} else {
+									ctrl.package2.validFiles.push(file);
+								}
+							});
+						}
+					});
+				}
+				function openAlert() {
+					ctrl.showAlert = true;
+				}
+				function closeAlert() {
+					ctrl.showAlert = false;
+				}
+				function cancel() {
+					$modalInstance.dismiss('cancel');
+				}
+				function ok() {
+					$modalInstance.close(ctrl.comment);
+				}
+				function back() {
+					if (ctrl.step > 1) { ctrl.step--; }
+				}
+				function next() {
+					ctrl.step++;
+				}
+				function removeFile(fileList, f) {
+					_.remove(fileList, f);
+				}
+				function uploadFiles(fileList) {
+					// TODO Wire-up uploader code
+					var uploadResponse = {};
+					return Promise.resolve(uploadResponse);
+				}
+				function submit() {
+					// All comments are submitted anonymously by default. Unless the user agrees to show their name on the public site.
+					var comment = ctrl.comment;
+					comment.isAnonymous = !ctrl.makeVisible;
+
+					// Upload the files and submit all captured data to server
+					return uploadFiles(ctrl.package1.validFiles)
+						.then(function(response) {
+							// TODO Process server-side response...
+							return response;
+						})
+						.then(function() {
+							return uploadFiles(ctrl.package2.validFiles);
+						})
+						.then(function(response) {
+							// TODO Process server-side response...
+							return response;
+						})
+						.then(function() {
+							// TODO
+							return CommentModel.add(comment);
+						})
+						.then (function (comment) {
+							ctrl.step = 7;  // Success...
+							$scope.$apply();
+						})
+						.catch (function (err) {
+							ctrl.step = 8;  // Error...
+							$scope.$apply();
+						});
+				}
+
+				// exports
+				comment.period = scope.period;
+				comment.project = scope.project;
+				comment.files = [];
+
+				setupUIState();
+
+				angular.extend(ctrl, {
+					step: 1,
+					comment: comment,
+					project: scope.project,
+					period: scope.period,
+					showAlert: false,
+					makeVisible: false,
+					maxFileSize: 5 * 1024 * 1024, // 5MB
+					package1: {
+						files: [],
+						validFiles: []
+					},
+					package2: {
+						files: [],
+						validFiles: []
+					}
+				});
+
+				// methods
+				angular.extend(ctrl, {
+					openAlert: openAlert,
+					closeAlert: closeAlert,
+					cancel: cancel,
+					ok: ok,
+					back: back,
+					next: next,
+					submit: submit,
+					removeFile: removeFile
+				});
+			}
+		})
+		.result.then(function (data) {
+			// Redirect to full PCP page
+			$state.transitionTo('p.commentperiod.detail', {projectid: scope.project.code, periodId: data.period._id}, {
+				reload: true, inherit: false, notify: true
+			});
+		})
+		.catch(function (err) {});
+	};
+}
+
+
+
 //
 // CC: pretty sure these are not used anymore
 //

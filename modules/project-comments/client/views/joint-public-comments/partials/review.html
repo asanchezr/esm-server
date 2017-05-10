@@ -1,7 +1,7 @@
 
 <span class="jpcp-step">Step 4 of 4</span>
 <h2>3. Review your Submission</h2>
-<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum</p>   
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum</p>
 
 <div class="pcp-comment-review">
 
@@ -10,18 +10,18 @@
         <h2>Your Details</h2>
         <div>
             <span>Name:</span>
-            <span>{{Bind Content}}</span>
+            <span>{{ctrl.comment.author}}</span>
         </div>
         <div>
             <div>Location:</div>
-            <span>{{Bind Content}}</span>
+            <span>{{ctrl.comment.location}}</span>
         </div>
     </section>
 
     <!-- Review Package  1 -->
     <section>
-        <h2>Comment on the ???</h2>
-        <p>{{Bind Comment}}</p>
+        <h2>Comment on the {{ctrl.period.informationLabel}}</h2>
+        <p>{{ctrl.comment.comment}}</p>
         <ul class="attachments">
             <li ng-repeat="">Attachment.pdf</li>
         </ul>
@@ -29,16 +29,16 @@
 
     <!-- Review Package  2 -->
     <section>
-        <h2>Comment on the ???</h2>
-        <p>{{Bind Comment}}</p>
+        <h2>Comment on the {{ctrl.period.informationLabel2}}</h2>
+        <p>{{ctrl.comment.comment2}}</p>
         <ul class="attachments">
             <li ng-repeat="">Attachment.pdf</li>
         </ul>
     </section>
 
     <div class="pcp-form-btns">
-        <button class="btn btn-default">Back</button>
-        <button class="btn btn-primary" type="submit">Submit</button>
+        <button class="btn btn-default" ng-click="ctrl.back()">Back</button>
+        <button class="btn btn-primary" type="submit" ng-click="ctrl.submit()">Submit</button>
     </div>
 
 </div>
